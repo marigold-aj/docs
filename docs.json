@@ -2,15 +2,13 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "One Perfect Slice",
-  "appearance": "system",
+  "appearance": {
+    "default": "system"
+  },
   "colors": {
     "primary": "#773624",
     "light": "#F08C80",
-    "dark": "#261B15",
-    "background": {
-      "light": "#FFFFFF",
-      "dark": "#0f1117"
-    }
+    "dark": "#261B15"
   },
   "font": {
     "headings": {
