@@ -1,0 +1,70 @@
+---
+title: "MCP Server"
+description: "Connect OPS to Claude and other AI agents using the Model Context Protocol."
+icon: "robot"
+---
+
+## What is the OPS MCP server?
+
+The OPS MCP (Model Context Protocol) server lets AI agents like Claude interact with your OPS data directly. Instead of copying data out of OPS and pasting it into an LLM, the agent can query slices, runs, posts, and evidence conversationally.
+
+For example, you can ask Claude:
+- *"List my available slices"*
+- *"Run the high-intent deals analysis on last month's calls"*
+- *"Search for evidence of budget objections in discovery calls"*
+- *"Get me the scorecard for the Acme Corp demo"*
+
+## Available tools
+
+The MCP server exposes 9 tools:
+
+| Tool | What it does |
+|------|-------------|
+| `list_slices` | Discover available analysis templates (27 slices across pipeline, deals, expansion, product) |
+| `preview_slice_count` | Check how many calls match your filters before running |
+| `run_slice` | Execute a slice analysis (auto-polls for results) |
+| `get_run` | Retrieve a past run's results and evidence |
+| `list_runs` | Browse run history with optional filtering |
+| `search_posts` | Find call summaries and scorecards |
+| `get_post` | Retrieve a single post in full detail |
+| `search_evidence` | Search evidence across completed runs |
+| `get_filter_options` | Discover valid filter values (call owners, companies, CRM deals, etc.) |
+
+## Prerequisites
+
+- **Node.js v20+** installed
+- An **OPS API key** (see [API Keys](/product/api-keys))
+- **Claude Code** or **Claude Desktop** installed
+
+## Setup
+
+Choose your client:
+
+<Columns cols={2}>
+  <Card title="Claude Code" icon="terminal" href="/mcp/claude-code">
+    Set up MCP in the Claude Code CLI.
+  </Card>
+  <Card title="Claude Desktop" icon="desktop" href="/mcp/claude-desktop">
+    Set up MCP in the Claude Desktop app.
+  </Card>
+</Columns>
+
+## Environment variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `OPS_API_KEY` | Yes | — | Your API key (starts with `sk_`) |
+| `OPS_RUN_TIMEOUT` | No | `30000` | Max time (ms) to wait for a slice run before handing off |
+| `OPS_MCP_LOG_LEVEL` | No | `info` | Logging level: debug, info, warn, error |
+| `OPS_MCP_LOG_FILE` | No | `~/.ops-mcp/logs/ops-mcp.log` | Log file location |
+
+## How it works
+
+The MCP server is a thin wrapper over the [OPS Public API](/api-reference). It translates natural-language requests from the agent into API calls.
+
+Some tools are **composites** — they combine multiple API calls into a single operation:
+- `run_slice` starts a run, polls for up to 30 seconds, and auto-fetches evidence on completion
+- `get_run` automatically fetches evidence when the run is complete
+- `get_filter_options` routes to the correct filter endpoint based on what you ask for
+
+All data respects the same team-scoping as the API — the agent can only see what your API key has access to.

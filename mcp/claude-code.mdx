@@ -1,0 +1,73 @@
+---
+title: "Claude Code Setup"
+description: "Install the OPS MCP server for Claude Code."
+icon: "terminal"
+---
+
+## Install
+
+<Steps>
+  <Step title="Check prerequisites">
+    Verify Node.js v20+ is installed:
+    ```bash
+    node --version  # must be v20.0.0 or higher
+    ```
+  </Step>
+  <Step title="Download the MCP server">
+    ```bash
+    curl -sL https://pub-a9df95cb361d4d8ca33bc8682da287c0.r2.dev/ops-mcp.tar.gz -o /tmp/ops-mcp.tar.gz
+    rm -rf ~/ops-mcp
+    tar xzf /tmp/ops-mcp.tar.gz -C ~
+    cd ~/ops-mcp && npm install
+    ```
+  </Step>
+  <Step title="Get your API key">
+    If you don't have one, create an API key in [Org Settings](https://app.oneperfectslice.ai/settings). It starts with `sk_`.
+  </Step>
+  <Step title="Register the MCP server">
+    ```bash
+    claude mcp add ops --scope user --transport stdio \
+      --env OPS_API_KEY=sk_your_api_key \
+      -- node $HOME/ops-mcp/src/index.js
+    ```
+  </Step>
+  <Step title="Verify">
+    Restart Claude Code, then run:
+    ```bash
+    claude mcp list
+    ```
+    You should see `ops` in the output.
+  </Step>
+</Steps>
+
+## Test it
+
+In Claude Code, try:
+
+```
+Use ops to list available slices
+```
+
+You should see a tool call to `list_slices` and get back a list of your team's slices.
+
+## Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| `ops` not showing in `mcp list` | Re-run the `claude mcp add` command and restart Claude Code |
+| `INVALID_OR_EXPIRED_TOKEN` in logs | Check your API key is correct. View logs at `~/.ops-mcp/logs/ops-mcp.log` |
+| `node: command not found` | Use the full path to node in the `claude mcp add` command (e.g., `/usr/local/bin/node`) |
+| Tool calls fail silently | Force-quit Claude Code completely and relaunch |
+
+## Updating
+
+To update to the latest version:
+
+```bash
+curl -sL https://pub-a9df95cb361d4d8ca33bc8682da287c0.r2.dev/ops-mcp.tar.gz -o /tmp/ops-mcp.tar.gz
+rm -rf ~/ops-mcp
+tar xzf /tmp/ops-mcp.tar.gz -C ~
+cd ~/ops-mcp && npm install
+```
+
+Your Claude Code configuration is preserved — just restart Claude Code after updating.

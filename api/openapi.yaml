@@ -1,0 +1,1959 @@
+openapi: "3.1.0"
+info:
+  title: OPS Public API
+  version: "1.0.0"
+  description: |
+    Programmatic access to One Perfect Slice. Authenticate with a team-scoped
+    API key (Bearer sk_...) obtained from OrgSettings.
+
+servers:
+  - url: /
+    description: OPS server root (paths include the full /api/public/v1 prefix)
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/public/v1/slices:
+    get:
+      operationId: listSlices
+      summary: List all slices available to the token's team
+      tags: [Slices]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Slice list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [slices]
+                    properties:
+                      slices:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/SliceSummary"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/public/v1/slices/{key}:
+    get:
+      operationId: getSlice
+      summary: Get full slice definition including outputSchema
+      tags: [Slices]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique slice key (e.g. "high_intent_deals")
+      responses:
+        "200":
+          description: Slice detail
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/SliceDetail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Monthly usage limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: USAGE_LIMIT_EXCEEDED
+                  message: Monthly usage limit for AI insights runs has been exceeded
+        "404":
+          description: Slice not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: SLICE_NOT_FOUND
+                  message: Slice not found
+
+  /api/public/v1/slices/{key}/preview-count:
+    post:
+      operationId: previewCount
+      summary: Return matched call count without triggering LLM analysis
+      tags: [Slices]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique slice key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SliceFilterRequest"
+      responses:
+        "200":
+          description: Matched call count
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [matchedCallCount]
+                    properties:
+                      matchedCallCount:
+                        type: integer
+                        description: Number of calls matching the filters
+                        example: 87
+        "400":
+          description: Invalid filters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              examples:
+                invalidFilters:
+                  value:
+                    error:
+                      code: INVALID_FILTERS
+                      message: Filter validation failed
+                dateRangeTooWide:
+                  value:
+                    error:
+                      code: DATE_RANGE_TOO_WIDE
+                      message: Maximum lookback is 90 days from today.
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Slice not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: SLICE_NOT_FOUND
+                  message: Slice not found
+        "503":
+          description: Preview count request timed out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: PREVIEW_COUNT_TIMEOUT
+                  message: Preview count request timed out
+
+  /api/public/v1/slices/{key}/run:
+    post:
+      operationId: runSlice
+      summary: Start async slice execution
+      tags: [Slices]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique slice key
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+            maxLength: 255
+          description: Client-provided idempotency key (Stripe convention). Same key + same args returns original runId. Same key + different args returns 409.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RunSliceRequest"
+      responses:
+        "202":
+          description: Run accepted (async execution started)
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/RunCreatedResponse"
+        "400":
+          description: Invalid filters or idempotency key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              examples:
+                invalidFilters:
+                  value:
+                    error:
+                      code: INVALID_FILTERS
+                      message: Filter validation failed
+                invalidIdempotencyKey:
+                  value:
+                    error:
+                      code: INVALID_IDEMPOTENCY_KEY
+                      message: Idempotency key must be between 1 and 255 characters
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Slice not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: SLICE_NOT_FOUND
+                  message: Slice not found
+        "409":
+          description: Idempotency key conflict (same key, different args)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: IDEMPOTENCY_KEY_CONFLICT
+                  message: Idempotency key was already used with different arguments
+        "429":
+          description: Team already has the maximum number of active slice runs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: CONCURRENT_RUN_LIMIT
+                  message: Maximum of 5 concurrent slice runs per team. Wait for existing runs to complete.
+        "503":
+          description: Temporary unavailability during billing or idempotency admission
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              examples:
+                billingUnavailable:
+                  value:
+                    error:
+                      code: BILLING_UNAVAILABLE
+                      message: Usage gating is temporarily unavailable
+                idempotencyInProgress:
+                  value:
+                    error:
+                      code: IDEMPOTENCY_KEY_IN_PROGRESS
+                      message: A run for this Idempotency-Key is currently being created. Retry after a short delay.
+
+  /api/public/v1/slice-runs:
+    get:
+      operationId: listSliceRuns
+      summary: List paginated run history, filterable by sliceKey and status
+      tags: [Slice Runs]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sliceKey
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by slice key
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pending, running, completed, failed]
+          description: Filter by run status
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Number of results per page (max 100)
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Offset for pagination
+      responses:
+        "200":
+          description: Paginated run list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SliceRunListItem"
+                  meta:
+                    $ref: "#/components/schemas/PaginationMeta"
+        "400":
+          description: Invalid filters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: INVALID_FILTERS
+                  message: "Invalid status filter. Valid values: pending, running, completed, failed"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "503":
+          description: Run history request timed out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: RUN_LIST_TIMEOUT
+                  message: Run history request timed out
+
+  /api/public/v1/slice-runs/{id}:
+    get:
+      operationId: getSliceRun
+      summary: Get run status, progress, and result when completed
+      tags: [Slice Runs]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Run ID
+      responses:
+        "200":
+          description: Run detail
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/SliceRunDetail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Run not found or belongs to different org
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: RUN_NOT_FOUND
+                  message: Run not found
+        "503":
+          description: Run lookup request timed out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: RUN_LOOKUP_TIMEOUT
+                  message: Run lookup request timed out
+
+  /api/public/v1/slice-runs/{id}/evidence:
+    get:
+      operationId: getSliceRunEvidence
+      summary: Get evidence items grouped by element, capped at 20 per element
+      tags: [Slice Runs]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Run ID
+      responses:
+        "200":
+          description: Evidence grouped by element
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/EvidenceResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Run not found or belongs to different org
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: RUN_NOT_FOUND
+                  message: Run not found
+        "409":
+          description: Run is not yet completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: RUN_NOT_COMPLETED
+                  message: Evidence is only available for completed runs
+        "503":
+          description: Evidence request timed out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: EVIDENCE_TIMEOUT
+                  message: Evidence request timed out
+
+  /api/public/v1/evidence/search:
+    post:
+      operationId: searchEvidence
+      summary: Search normalized evidence across completed runs
+      tags: [Slice Runs]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublicEvidenceSearchRequest"
+      responses:
+        "200":
+          description: Matching evidence items
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      matches:
+                        type: array
+                        items:
+                          type: object
+        "400":
+          description: Invalid request body or filters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "503":
+          description: Evidence request timed out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /api/public/v1/posts/search:
+    post:
+      operationId: searchPosts
+      summary: Search posts for the token's team using structured filters
+      description: CRM filter values are selected from org-scoped CRM reference data, but returned posts remain team-scoped.
+      tags: [Posts]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublicPostSearchRequest"
+      responses:
+        "200":
+          description: Paginated post search results
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: object
+                    required: [posts]
+                    properties:
+                      posts:
+                        type: array
+                        items:
+                          oneOf:
+                            - $ref: "#/components/schemas/PublicPostSummaryResponse"
+                            - $ref: "#/components/schemas/PublicPostResponse"
+                  meta:
+                    $ref: "#/components/schemas/PaginationMeta"
+        "400":
+          description: Invalid request body or filters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              examples:
+                invalidRequest:
+                  value:
+                    error:
+                      code: INVALID_REQUEST
+                      message: Malformed JSON body
+                invalidFilters:
+                  value:
+                    error:
+                      code: INVALID_FILTERS
+                      message: Limit must be between 1 and 100
+                dateRangeTooWide:
+                  value:
+                    error:
+                      code: DATE_RANGE_TOO_WIDE
+                      message: Maximum lookback is 90 days from today.
+                filterArrayTooLarge:
+                  value:
+                    error:
+                      code: FILTER_ARRAY_TOO_LARGE
+                      message: Filter array exceeds maximum size
+                      details:
+                        field: crmDealStages
+                        maxAllowed: 100
+                        validValuesEndpoint: /api/public/v1/filters/crm-deal-stages
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "503":
+          description: Post search request timed out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: POST_SEARCH_TIMEOUT
+                  message: Post search request timed out
+
+  /api/public/v1/posts/{id}:
+    get:
+      operationId: getPost
+      summary: Retrieve a single post by id
+      tags: [Posts]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Full post detail
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/PublicPostResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /api/public/v1/posts/filters:
+    get:
+      operationId: listPostFilters
+      summary: List available post filters for the token's team
+      tags: [Posts]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Available post filters
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [filters]
+                    properties:
+                      filters:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/PostFilter"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "503":
+          description: Filter discovery request timed out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: FILTER_LOOKUP_TIMEOUT
+                  message: Filter discovery request timed out
+
+  /api/public/v1/call-types:
+    get:
+      operationId: listCallTypes
+      summary: List active call types for the token's team
+      tags: [Reference Data]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Team-scoped call types
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [callTypes]
+                    properties:
+                      callTypes:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/PublicCallTypeResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/public/v1/elements:
+    get:
+      operationId: listElements
+      summary: List active elements for the token's team
+      tags: [Reference Data]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Team-scoped elements
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [elements]
+                    properties:
+                      elements:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/PublicElementResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/public/v1/filters/call-owners:
+    get:
+      operationId: getCallOwners
+      summary: Search call owners for the token's team
+      tags: [Filters]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Optional prefix search string
+      responses:
+        "200":
+          description: Team-scoped call owner options
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [callOwners]
+                    properties:
+                      callOwners:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/PublicCallOwnerOption"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "503":
+          description: Filter lookup request timed out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: FILTER_LOOKUP_TIMEOUT
+                  message: Filter lookup request timed out
+
+  /api/public/v1/filters/company-domains:
+    get:
+      operationId: getCompanyDomains
+      summary: Search company domains for the token's team
+      tags: [Filters]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Optional prefix search string
+      responses:
+        "200":
+          description: Team-scoped company domain options
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [companyDomains]
+                    properties:
+                      companyDomains:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/PublicCompanyDomainOption"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "503":
+          description: Filter lookup request timed out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: FILTER_LOOKUP_TIMEOUT
+                  message: Filter lookup request timed out
+
+  /api/public/v1/filters/crm-deals:
+    get:
+      operationId: getCrmDeals
+      summary: Search CRM deals for filter typeahead
+      description: CRM deal reference data is org-scoped because the CRM connection is organization-owned.
+      tags: [Filters]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Optional prefix search string
+      responses:
+        "200":
+          description: Org-scoped CRM deal options
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [crmDeals]
+                    properties:
+                      crmDeals:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/PublicCrmDealOption"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "503":
+          description: Filter lookup request timed out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: FILTER_LOOKUP_TIMEOUT
+                  message: Filter lookup request timed out
+
+  /api/public/v1/filters/crm-companies:
+    get:
+      operationId: getCrmCompanies
+      summary: Search CRM companies for filter typeahead
+      description: CRM company reference data is org-scoped because the CRM connection is organization-owned.
+      tags: [Filters]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Optional prefix search string
+      responses:
+        "200":
+          description: Org-scoped CRM company options
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [crmCompanies]
+                    properties:
+                      crmCompanies:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/PublicCrmCompanyOption"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "503":
+          description: Filter lookup request timed out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                error:
+                  code: FILTER_LOOKUP_TIMEOUT
+                  message: Filter lookup request timed out
+
+  /api/public/v1/filters/crm-deal-stages:
+    get:
+      operationId: getCrmDealStages
+      summary: List CRM deal stages for filter dropdown
+      description: CRM deal stage reference data is org-scoped because the CRM connection is organization-owned.
+      tags: [Filters]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Org-scoped CRM deal stage options
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [crmDealStages]
+                    properties:
+                      crmDealStages:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/PublicCrmDealStageOption"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/public/v1/filters/crm-fields:
+    get:
+      operationId: getCrmFields
+      summary: List configured CRM fields for filtering
+      description: CRM field configs are org-scoped because integration state and field configuration are organization-owned.
+      tags: [Filters]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Org-scoped CRM field filter configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [fields]
+                    properties:
+                      fields:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/CrmFieldFilterConfig"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: "API key with sk_ prefix. Obtain from OrgSettings > API Keys."
+
+  responses:
+    Unauthorized:
+      description: Authentication failed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+          examples:
+            missingToken:
+              value:
+                error:
+                  code: MISSING_TOKEN
+                  message: Authorization header with Bearer token is required
+            invalidToken:
+              value:
+                error:
+                  code: INVALID_TOKEN
+                  message: Token is invalid
+            tokenRevoked:
+              value:
+                error:
+                  code: TOKEN_REVOKED
+                  message: Token has been revoked
+            tokenExpired:
+              value:
+                error:
+                  code: TOKEN_EXPIRED
+                  message: Token has expired
+
+  schemas:
+    ApiResponse:
+      type: object
+      description: Standard success envelope for all public API responses
+      required: [data]
+      properties:
+        data:
+          description: Response payload (type varies per endpoint)
+        meta:
+          type: object
+          description: Optional metadata (e.g. pagination)
+          properties:
+            pagination:
+              $ref: "#/components/schemas/Pagination"
+
+    ApiError:
+      type: object
+      description: Standard error envelope for all public API error responses
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              description: Machine-readable UPPER_SNAKE_CASE error code
+              example: INVALID_TOKEN
+            message:
+              type: string
+              description: Human-readable error description
+              example: Token is invalid
+            details:
+              type: object
+              description: Optional additional error context
+              additionalProperties: true
+
+    Pagination:
+      type: object
+      required: [totalCount, hasMore, limit, offset]
+      properties:
+        totalCount:
+          type: integer
+          description: Total number of results across all pages
+          example: 142
+        hasMore:
+          type: boolean
+          description: Whether more results exist beyond the current page
+          example: true
+        limit:
+          type: integer
+          description: Number of results per page
+          example: 20
+        offset:
+          type: integer
+          description: Current offset into the result set
+          example: 0
+
+    PaginationMeta:
+      type: object
+      required: [pagination]
+      properties:
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    PublicPostSearchRequest:
+      type: object
+      description: Team-scoped structured post search request. Send an empty JSON object (`{}`) to return recent posts. CRM filter values reference org-scoped CRM objects, but returned posts remain team-scoped.
+      properties:
+        callTypeId:
+          type: array
+          items:
+            type: integer
+            format: int64
+          maxItems: 100
+          description: Filter by call type IDs
+        templateType:
+          type: array
+          items:
+            type: string
+            enum: [summary, scorecard]
+          maxItems: 100
+          description: Filter by template type
+        startDate:
+          type: string
+          format: date-time
+          description: Start datetime (inclusive)
+        endDate:
+          type: string
+          format: date-time
+          description: End datetime (inclusive)
+        callOwnerEmails:
+          type: array
+          items:
+            type: string
+          maxItems: 100
+          description: Filter by call owner email
+        companyDomains:
+          type: array
+          items:
+            type: string
+          maxItems: 100
+          description: Filter by company domain
+        crmDealIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+          maxItems: 100
+          description: Filter by CRM deal IDs
+        crmCompanyIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+          maxItems: 100
+          description: Filter by CRM company IDs
+        crmDealStages:
+          type: array
+          items:
+            type: string
+          maxItems: 100
+          description: Filter by CRM deal stages
+        crmAmountMin:
+          type: number
+          description: Minimum CRM deal amount
+        crmAmountMax:
+          type: number
+          description: Maximum CRM deal amount
+        crmCustomFieldFilters:
+          type: array
+          items:
+            $ref: "#/components/schemas/CrmFieldFilterValue"
+          maxItems: 100
+          description: Custom CRM field filters
+        detail:
+          type: boolean
+          default: false
+          description: Return full post payloads when true; compact summaries when false
+        fields:
+          type: array
+          items:
+            type: string
+          description: Optional response field selection hint
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+        offset:
+          type: integer
+          minimum: 0
+          default: 0
+
+    PublicEvidenceSearchRequest:
+      type: object
+      required: [elementKeys]
+      properties:
+        elementKeys:
+          type: array
+          items:
+            type: string
+        query:
+          type: string
+        callTypes:
+          type: array
+          items:
+            type: string
+          maxItems: 100
+          description: Filter transcript evidence by call type key
+        callOwnerEmails:
+          type: array
+          items:
+            type: string
+        dateFrom:
+          type: string
+          format: date
+        dateTo:
+          type: string
+          format: date
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+
+    PublicPostSummaryResponse:
+      type: object
+      required: [fileId, title, date, templateType, snippet]
+      properties:
+        postId:
+          type: integer
+          format: int64
+          nullable: true
+        fileId:
+          type: integer
+          format: int64
+          description: Underlying call/file identifier. Use this to deduplicate summary and scorecard rows for the same call.
+        title:
+          type: string
+        date:
+          type: string
+          format: date-time
+        callOwnerEmail:
+          type: string
+          nullable: true
+        companyDomain:
+          type: string
+          nullable: true
+        templateType:
+          type: string
+          enum: [summary, scorecard]
+        snippet:
+          type: string
+
+    PublicPostResponse:
+      type: object
+      required: [fileId, callTypeId, callTypeName, templateType, title, published, result, postCreatedAt, fileCreatedAt, user, team]
+      properties:
+        postId:
+          type: integer
+          format: int64
+          nullable: true
+        fileId:
+          type: integer
+          format: int64
+        callTypeId:
+          type: integer
+          format: int64
+        callTypeName:
+          type: string
+        templateType:
+          type: string
+          enum: [summary, scorecard]
+        title:
+          type: string
+        published:
+          type: boolean
+        result:
+          type: object
+          description: Structured post payload
+          additionalProperties: true
+        postCreatedAt:
+          type: string
+          format: date-time
+        fileCreatedAt:
+          type: string
+          format: date-time
+        user:
+          $ref: "#/components/schemas/PublicPostUserInfo"
+        team:
+          $ref: "#/components/schemas/PublicPostTeamInfo"
+        callOwnerName:
+          type: string
+          nullable: true
+        callOwnerEmail:
+          type: string
+          nullable: true
+        companyDomain:
+          type: string
+          nullable: true
+        externalUrl:
+          type: string
+          nullable: true
+        aiGeneratedTitle:
+          type: string
+          nullable: true
+
+    PublicPostUserInfo:
+      type: object
+      required: [id, email]
+      properties:
+        id:
+          type: integer
+          format: int64
+        email:
+          type: string
+        fullName:
+          type: string
+          nullable: true
+
+    PublicPostTeamInfo:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+
+    PostFilter:
+      type: object
+      required: [key, displayName, values]
+      properties:
+        key:
+          type: string
+          example: templateType
+        displayName:
+          type: string
+          example: Template Type
+        values:
+          type: array
+          items:
+            $ref: "#/components/schemas/PostFilterValueOption"
+
+    PostFilterValueOption:
+      type: object
+      required: [key, displayName]
+      properties:
+        key:
+          type: string
+          example: scorecard
+        displayName:
+          type: string
+          example: Scorecard
+
+    PublicCallTypeResponse:
+      type: object
+      required: [key, label, description, status, numCalls]
+      properties:
+        key:
+          type: string
+          example: discovery_call
+        label:
+          type: string
+          example: Discovery Call
+        description:
+          type: string
+          example: Initial discovery conversation with prospect.
+        status:
+          type: string
+          example: main
+        numCalls:
+          type: integer
+          example: 42
+
+    PublicElementResponse:
+      type: object
+      required: [key, label, description, status]
+      properties:
+        key:
+          type: string
+          example: budget_confirmation
+        label:
+          type: string
+          example: Budget Confirmation
+        description:
+          type: string
+          example: Prospect confirms available budget.
+        status:
+          type: string
+          example: main
+
+    PublicCallOwnerOption:
+      type: object
+      required: [id, displayName, email, callCount]
+      properties:
+        id:
+          type: string
+          example: jane@acme.com
+        displayName:
+          type: string
+          example: Jane Smith
+        email:
+          type: string
+          example: jane@acme.com
+        callCount:
+          type: integer
+          example: 15
+
+    PublicCompanyDomainOption:
+      type: object
+      required: [id, displayName, callCount]
+      properties:
+        id:
+          type: string
+          example: acme.com
+        displayName:
+          type: string
+          example: acme.com
+        callCount:
+          type: integer
+          example: 28
+
+    PublicCrmDealOption:
+      type: object
+      required: [id, externalId, name, callCount]
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 101
+        externalId:
+          type: string
+          example: hs_12345
+        name:
+          type: string
+          example: Acme Enterprise
+        stage:
+          type: string
+          nullable: true
+          example: Qualification
+        amount:
+          type: number
+          nullable: true
+          example: 50000
+        callCount:
+          type: integer
+          example: 0
+
+    PublicCrmCompanyOption:
+      type: object
+      required: [id, externalId, name, callCount]
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 201
+        externalId:
+          type: string
+          example: hs_67890
+        name:
+          type: string
+          example: Acme Corp
+        callCount:
+          type: integer
+          example: 0
+
+    PublicCrmDealStageOption:
+      type: object
+      required: [id, displayName, callCount]
+      properties:
+        id:
+          type: string
+          example: Qualification
+        displayName:
+          type: string
+          example: Qualification
+        callCount:
+          type: integer
+          example: 12
+
+    CrmFieldFilterConfig:
+      type: object
+      required: [entityType, fieldName, fieldLabel, fieldType, isSystem]
+      properties:
+        entityType:
+          type: string
+          enum: [deal, company, contact]
+        fieldName:
+          type: string
+          example: industry
+        fieldLabel:
+          type: string
+          example: Industry
+        fieldType:
+          type: string
+          enum: [string, number, date, datetime, boolean, enumeration]
+        isSystem:
+          type: boolean
+          example: false
+        options:
+          type: array
+          nullable: true
+          items:
+            $ref: "#/components/schemas/CrmFieldFilterOption"
+
+    CrmFieldFilterOption:
+      type: object
+      required: [label, value]
+      properties:
+        label:
+          type: string
+          example: Law Firm
+        value:
+          type: string
+          example: law_firm
+
+    SliceSummary:
+      type: object
+      required: [key, title, objective, description, elementKeys]
+      properties:
+        key:
+          type: string
+          description: Unique slice identifier
+          example: high_intent_deals
+        title:
+          type: string
+          description: Human-readable slice name
+          example: High-Intent Deals
+        objective:
+          type: string
+          description: Business objective category
+          enum: [pipeline, deals, expand, product]
+          example: pipeline
+        description:
+          type: string
+          description: What this slice surfaces
+          example: Surfaces deals showing strong buying signals.
+        elementKeys:
+          type: array
+          items:
+            type: string
+          description: Element keys this slice evaluates
+          example: [intent_signal, budget_confirmation]
+
+    SliceDetail:
+      type: object
+      required: [key, title, objective, description, elementKeys, outputSchema, preferredModel, includeCrmData, evidenceGrouping]
+      properties:
+        key:
+          type: string
+          example: high_intent_deals
+        title:
+          type: string
+          example: High-Intent Deals
+        objective:
+          type: string
+          enum: [pipeline, deals, expand, product]
+          example: pipeline
+        description:
+          type: string
+          example: Surfaces deals showing strong buying signals.
+        elementKeys:
+          type: array
+          items:
+            type: string
+          example: [intent_signal, budget_confirmation]
+        outputSchema:
+          type: object
+          description: JSON schema defining the structured output of this slice
+          additionalProperties: true
+        preferredModel:
+          type: string
+          description: LLM model used for analysis
+          example: gpt-5-mini
+        includeCrmData:
+          type: boolean
+          description: Whether CRM data is included in analysis context
+          example: true
+        evidenceGrouping:
+          type: string
+          description: How evidence is grouped in results
+          enum: [ByElement, ByAccount]
+          example: ByElement
+
+    SliceFilterRequest:
+      type: object
+      description: Filters for preview-count. dateFrom and dateTo are required. CRM filter values reference org-scoped CRM objects, but matched results remain team-scoped.
+      required: [dateFrom, dateTo]
+      properties:
+        dateFrom:
+          type: string
+          format: date
+          description: Start date (inclusive)
+          example: "2026-03-26"
+        dateTo:
+          type: string
+          format: date
+          description: End date (inclusive)
+          example: "2026-04-26"
+        callTypes:
+          type: array
+          items:
+            type: string
+          maxItems: 100
+          description: Filter by call types
+        callOwnerEmails:
+          type: array
+          items:
+            type: string
+          maxItems: 100
+          description: Filter by call owner emails
+        companyDomains:
+          type: array
+          items:
+            type: string
+          maxItems: 100
+          description: Filter by company domains
+        crmDealIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+          maxItems: 100
+          description: Filter by CRM deal IDs
+        crmCompanyIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+          maxItems: 100
+          description: Filter by CRM company IDs
+        crmDealStages:
+          type: array
+          items:
+            type: string
+          maxItems: 100
+          description: Filter by CRM deal stages
+          example: [Qualification, Proposal]
+        crmAmountMin:
+          type: number
+          description: Minimum CRM deal amount
+        crmAmountMax:
+          type: number
+          description: Maximum CRM deal amount
+        crmCustomFieldFilters:
+          type: array
+          items:
+            $ref: "#/components/schemas/CrmFieldFilterValue"
+          description: Custom CRM field filters
+
+    RunSliceRequest:
+      type: object
+      description: Filters for slice run. dateFrom and dateTo use ISO-8601 datetime. CRM filter values reference org-scoped CRM objects, but execution remains team-scoped.
+      properties:
+        dateFrom:
+          type: string
+          format: date-time
+          description: Start datetime (ISO-8601)
+          example: "2026-03-26T00:00:00Z"
+        dateTo:
+          type: string
+          format: date-time
+          description: End datetime (ISO-8601)
+          example: "2026-04-26T00:00:00Z"
+        callTypes:
+          type: array
+          items:
+            type: string
+          maxItems: 100
+          description: Filter by call types
+        sourceIds:
+          type: array
+          items:
+            type: string
+          maxItems: 100
+          description: Filter by source file IDs
+        userPrompt:
+          type: string
+          description: Optional user prompt to customize analysis
+        callOwnerEmails:
+          type: array
+          items:
+            type: string
+          maxItems: 100
+          description: Filter by call owner emails
+        companyDomains:
+          type: array
+          items:
+            type: string
+          maxItems: 100
+          description: Filter by company domains
+        crmDealIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+          maxItems: 100
+          description: Filter by CRM deal IDs
+        crmCompanyIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+          maxItems: 100
+          description: Filter by CRM company IDs
+        crmDealStages:
+          type: array
+          items:
+            type: string
+          maxItems: 100
+          description: Filter by CRM deal stages
+          example: [Qualification, Proposal]
+        crmAmountMin:
+          type: number
+          description: Minimum CRM deal amount
+        crmAmountMax:
+          type: number
+          description: Maximum CRM deal amount
+        crmCustomFieldFilters:
+          type: array
+          items:
+            $ref: "#/components/schemas/CrmFieldFilterValue"
+          description: Custom CRM field filters
+
+    CrmFieldFilterValue:
+      type: object
+      description: Custom CRM field filter
+      required: [entityType, fieldName, fieldType]
+      properties:
+        entityType:
+          type: string
+          enum: [deal, company, contact]
+          description: CRM entity type
+        fieldName:
+          type: string
+          description: Field name in the CRM
+        fieldType:
+          type: string
+          enum: [string, number, date, datetime, boolean, enumeration]
+          description: Data type of the field
+        stringValue:
+          type: string
+          description: Filter value for string fields
+        numberMin:
+          type: number
+          description: Range start for number fields
+        numberMax:
+          type: number
+          description: Range end for number fields
+        dateStart:
+          type: string
+          description: Range start for date/datetime fields (ISO-8601)
+        dateEnd:
+          type: string
+          description: Range end for date/datetime fields (ISO-8601)
+        booleanValue:
+          type: boolean
+          description: Filter value for boolean fields
+        enumValues:
+          type: array
+          items:
+            type: string
+          description: Selected values for enumeration fields (multi-select)
+
+    RunCreatedResponse:
+      type: object
+      required: [runId, sliceKey, sliceTitle, status]
+      properties:
+        runId:
+          type: integer
+          format: int64
+          description: Unique run identifier for polling
+          example: 12345
+        sliceKey:
+          type: string
+          example: high_intent_deals
+        sliceTitle:
+          type: string
+          example: High-Intent Deals
+        status:
+          type: string
+          enum: [running]
+          description: Always "running" for a newly created run
+          example: running
+
+    SliceRunListItem:
+      type: object
+      required: [id, sliceKey, sliceTitle, status, callsAnalyzed, filterSummary, startedAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 12345
+        sliceKey:
+          type: string
+          example: high_intent_deals
+        sliceTitle:
+          type: string
+          example: High-Intent Deals
+        status:
+          type: string
+          enum: [pending, running, completed, failed]
+          example: completed
+        matchedCallCount:
+          type: integer
+          nullable: true
+          description: Total calls matching filters (null until evidence summary populated)
+          example: 87
+        callsAnalyzed:
+          type: integer
+          description: Number of calls analyzed so far
+          example: 42
+        filterSummary:
+          $ref: "#/components/schemas/SliceRunFilterSummary"
+        startedAt:
+          type: string
+          format: date-time
+          example: "2026-04-26T14:30:00Z"
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2026-04-26T14:32:18Z"
+
+    SliceRunDetail:
+      type: object
+      required: [id, sliceKey, sliceTitle, status, phase, callsAnalyzed, filters, startedAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 12345
+        sliceKey:
+          type: string
+          example: high_intent_deals
+        sliceTitle:
+          type: string
+          example: High-Intent Deals
+        status:
+          type: string
+          enum: [pending, running, completed, failed]
+          example: completed
+        phase:
+          type: string
+          enum: [queued, gathering_evidence, analyzing_calls, synthesizing, completed, failed]
+          description: Coarse execution phase for the run
+          example: analyzing_calls
+        matchedCallCount:
+          type: integer
+          nullable: true
+          description: Total calls matching filters (null until evidence summary populated)
+          example: 87
+        callsAnalyzed:
+          type: integer
+          description: Number of calls analyzed so far
+          example: 42
+        filters:
+          type: object
+          description: Filters that were applied for this run
+          additionalProperties: true
+        result:
+          type: object
+          nullable: true
+          description: Structured result conforming to the slice's outputSchema (null until completed)
+          additionalProperties: true
+        error:
+          type: string
+          nullable: true
+          description: Error message if run failed (null unless status is "failed")
+        suggestedPollAfterSeconds:
+          type: integer
+          nullable: true
+          description: Suggested delay before polling the run again
+          example: 15
+        progressMessage:
+          type: string
+          nullable: true
+          description: Human-readable progress guidance for in-flight runs
+          example: Run is analyzing matched calls.
+        startedAt:
+          type: string
+          format: date-time
+          example: "2026-04-26T14:30:00Z"
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2026-04-26T14:32:18Z"
+
+    SliceRunFilterSummary:
+      type: object
+      required: [callTypes, callOwnerEmails, companyDomains, crmDealStages, crmDealIdsCount, crmCompanyIdsCount, hasCrmCustomFieldFilters]
+      properties:
+        dateFrom:
+          type: string
+          nullable: true
+          description: ISO datetime lower bound from the original run filters, when present
+          example: "2026-03-01T00:00:00.000Z"
+        dateTo:
+          type: string
+          nullable: true
+          description: ISO datetime upper bound from the original run filters, when present
+          example: "2026-04-01T00:00:00.000Z"
+        callTypes:
+          type: array
+          items:
+            type: string
+          description: Call type keys used when the run was created
+        callOwnerEmails:
+          type: array
+          items:
+            type: string
+          description: Call owner filters used when the run was created
+        companyDomains:
+          type: array
+          items:
+            type: string
+          description: Company domain filters used when the run was created
+        crmDealStages:
+          type: array
+          items:
+            type: string
+          description: CRM deal stage filters used when the run was created
+        crmDealIdsCount:
+          type: integer
+          description: Number of CRM deal IDs present in the original filter set
+          example: 2
+        crmCompanyIdsCount:
+          type: integer
+          description: Number of CRM company IDs present in the original filter set
+          example: 1
+        hasCrmCustomFieldFilters:
+          type: boolean
+          description: Whether the original run used CRM custom field filters
+          example: true
+
+    EvidenceResponse:
+      type: object
+      required: [summary, elements]
+      properties:
+        summary:
+          $ref: "#/components/schemas/EvidenceSummary"
+        elements:
+          type: object
+          description: Evidence items keyed by element key. Each value is an ElementEvidence object.
+          additionalProperties:
+            $ref: "#/components/schemas/ElementEvidence"
+
+    EvidenceSummary:
+      type: object
+      required: [totalSources, totalElements, sourceBreakdown]
+      properties:
+        totalSources:
+          type: integer
+          description: Total number of unique sources referenced
+          example: 15
+        totalElements:
+          type: integer
+          description: Number of distinct elements with evidence
+          example: 2
+        sourceBreakdown:
+          type: object
+          description: Count of sources by type (e.g. transcript, crm_deal)
+          additionalProperties:
+            type: integer
+          example:
+            transcript: 12
+            crm_deal: 3
+
+    ElementEvidence:
+      type: object
+      required: [count, items]
+      properties:
+        count:
+          type: integer
+          description: Total number of evidence items for this element (may exceed items array length due to 20-item cap)
+          example: 8
+        items:
+          type: array
+          maxItems: 20
+          items:
+            $ref: "#/components/schemas/EvidenceItem"
+
+    EvidenceItem:
+      type: object
+      required: [quote, source, confidence]
+      properties:
+        quote:
+          type: string
+          description: Extracted quote from the source
+          example: "We're aiming to have a vendor selected by end of Q2."
+        source:
+          $ref: "#/components/schemas/EvidenceSource"
+        confidence:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+          description: Confidence score (0.0 to 1.0)
+          example: 0.91
+
+    EvidenceSource:
+      type: object
+      required: [type, id, label]
+      properties:
+        type:
+          type: string
+          description: Source type
+          example: transcript
+        id:
+          type: string
+          description: Source identifier
+          example: "file:98123"
+        label:
+          type: string
+          description: Human-readable source label
+          example: "Acme Corp — Discovery Call"
+        date:
+          type: string
+          format: date
+          description: Date of the source material
+          example: "2026-04-12"

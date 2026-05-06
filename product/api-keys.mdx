@@ -1,0 +1,53 @@
+---
+title: "API Keys"
+description: "Create and manage API keys for programmatic access to OPS."
+icon: "key"
+---
+
+## Overview
+
+API keys let you access the OPS Public API programmatically. Each key is scoped to a specific team and grants read access to that team's data.
+
+Keys are prefixed with `sk_` and authenticate via the `Authorization: Bearer` header.
+
+## Creating an API key
+
+<Steps>
+  <Step title="Open Org Settings">
+    Navigate to **Organization Settings** → **API Keys**. You'll need Org Admin permissions.
+  </Step>
+  <Step title="Create a key">
+    Click **Create API Key**. Provide a name (e.g., "Production" or "MCP Server") and select the team it should be scoped to.
+  </Step>
+  <Step title="Copy the key">
+    Your key will be displayed **once**. Copy it immediately and store it in a secure location (e.g., a password manager or environment variable).
+  </Step>
+</Steps>
+
+<Warning>
+  The raw key value is never stored by OPS — only a secure hash. If you lose it, you'll need to create a new one.
+</Warning>
+
+## Managing keys
+
+From the API Keys page, you can see all keys for your organization:
+
+- **Name** — the label you gave the key
+- **Team** — which team the key is scoped to
+- **Last used** — when the key was last used for an API call
+- **Revoke** — permanently disable the key
+
+## Security
+
+- Keys are stored using **Argon2id** hashing (the same algorithm used for passwords)
+- Token verification uses constant-time comparison to prevent timing attacks
+- Keys are team-scoped — a key for Team A cannot access Team B's data
+- Revoked keys are immediately invalidated
+
+## Best practices
+
+- Create separate keys for different use cases (e.g., one for your integration, one for MCP)
+- Rotate keys periodically
+- Never commit keys to source control
+- Use environment variables to store keys in your applications
+- Revoke keys immediately if they may have been exposed

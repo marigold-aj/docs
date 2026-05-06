@@ -1,0 +1,71 @@
+---
+title: "CRM Integration"
+description: "Connect your CRM to enrich conversation data with deal, company, and contact context."
+icon: "plug"
+---
+
+## Supported CRMs
+
+| CRM | Status |
+|-----|--------|
+| **HubSpot** | Available |
+| Salesforce | Coming soon |
+
+## What gets synced
+
+When you connect your CRM, OPS syncs three entity types:
+
+| Entity | Data synced |
+|--------|------------|
+| **Deals** | Name, stage, pipeline, amount, close date, owner, custom fields |
+| **Companies** | Name, domain, lifecycle stage, owner, custom fields |
+| **Contacts** | Email, name, lifecycle stage, owner, custom fields |
+
+OPS associates CRM records with calls by matching participant email addresses.
+
+## Connecting your CRM
+
+<Steps>
+  <Step title="Open Org Settings">
+    Navigate to **Organization Settings** → **Integrations**. You'll need Org Admin permissions.
+  </Step>
+  <Step title="Connect HubSpot">
+    Click **Connect** on the HubSpot card. An OAuth popup will appear — authorize OPS to access your HubSpot account.
+  </Step>
+  <Step title="Configure sync settings">
+    After connecting, click **Settings** to configure:
+    - **Sync Settings** — toggle Deals, Companies, and Contacts on or off
+    - **Field Settings** — select which fields to sync (up to 10 custom fields per entity)
+  </Step>
+</Steps>
+
+## Sync schedule
+
+- CRM data syncs automatically **every 4 hours**
+- You can trigger a manual resync from the integration settings (rate-limited to once per hour)
+- OAuth tokens are refreshed automatically
+
+## How CRM data is used
+
+Once connected, CRM data enhances OPS in several ways:
+
+- **Filtering** — filter slices, posts, and runs by CRM deal, company, stage, or amount
+- **Enrichment** — CRM context is included when slices analyze calls, providing richer evidence
+- **Custom fields** — map CRM fields to create custom filters (e.g., filter by industry, deal size tier, or any custom property)
+
+## Filter typeaheads
+
+The API provides typeahead endpoints for building filter UIs with CRM data:
+
+- `/filters/crm-deals` — search deals by name
+- `/filters/crm-companies` — search companies by name
+- `/filters/crm-deal-stages` — list available deal stages
+- `/filters/crm-fields` — list configured custom fields and their valid values
+
+<Note>
+  CRM reference data (deals, companies, stages, fields) is **org-scoped** because the CRM connection is shared across the organization. Calls and posts remain **team-scoped**.
+</Note>
+
+## Disconnecting
+
+You can disconnect your CRM at any time from Org Settings. Disconnecting clears the OAuth tokens but retains previously synced CRM data.

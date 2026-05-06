@@ -1,0 +1,74 @@
+---
+title: "Slices"
+description: "AI-powered analysis templates that surface structured insights from your conversations."
+icon: "chart-pie"
+---
+
+## What are slices?
+
+Slices are pre-built AI analyses that answer specific business questions by examining your call transcripts and CRM data. Each slice gathers evidence, runs it through an LLM, and produces structured, scored output.
+
+OPS includes **27 pre-built slices** organized by business objective:
+
+| Objective | What it covers | Example slices |
+|-----------|---------------|----------------|
+| **Pipeline** | Grow your pipeline | Campaign ideas, content ideas, messaging hooks |
+| **Deals** | Win more deals | Enablement priorities, objection patterns |
+| **Expand** | Grow existing accounts | Expansion priorities, stakeholder mapping |
+| **Product** | Improve your product | Roadmap priorities, competitive intel |
+
+## How to run a slice
+
+<Steps>
+  <Step title="Browse the catalog">
+    View available slices in the app, filtered by your role or business objective.
+  </Step>
+  <Step title="Configure filters">
+    Narrow the analysis scope with filters:
+    - **Date range** (up to 90 days lookback)
+    - **Call types** (discovery, demo, etc.)
+    - **Call owners** (specific reps)
+    - **Company domains**
+    - **CRM deals, companies, or stages**
+  </Step>
+  <Step title="Preview">
+    Use "Preview Count" to see how many calls match your filters before committing to a run.
+  </Step>
+  <Step title="Run">
+    Start the analysis. Runs execute asynchronously — you can leave and come back.
+  </Step>
+  <Step title="Review results">
+    When complete, view structured output with a quality score (0.0 to 1.0) assessing completeness, specificity, grounding, and actionability.
+  </Step>
+  <Step title="Explore evidence">
+    Drill into the evidence: see which calls and CRM records supported each insight, with direct quotes and confidence scores.
+  </Step>
+</Steps>
+
+## Run lifecycle
+
+A slice run progresses through these phases:
+
+```
+queued → gathering_evidence → analyzing_calls → synthesizing → completed
+```
+
+If something goes wrong, the run moves to `failed` with an error message.
+
+## Evidence
+
+Every insight is backed by traceable evidence. Evidence items include:
+
+- **Quote** — the exact text from a transcript or CRM record
+- **Source** — which call or CRM object the quote came from
+- **Confidence** — a score from 0.0 to 1.0
+
+Evidence is grouped by element (the specific thing being evaluated, like "budget confirmation" or "competitive mention").
+
+## Using slices via the API
+
+You can run the full slice lifecycle programmatically. See the [Quickstart](/quickstart) for a walkthrough, or jump to the [API Reference](/api-reference) for full endpoint documentation.
+
+## Using slices via MCP
+
+If you use Claude Code or Claude Desktop, the [OPS MCP server](/mcp/overview) lets you run slices conversationally — just ask Claude to analyze your recent calls.

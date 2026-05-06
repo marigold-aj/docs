@@ -1,0 +1,100 @@
+---
+title: "Claude Desktop Setup"
+description: "Install the OPS MCP server for Claude Desktop."
+icon: "desktop"
+---
+
+## Install
+
+<Steps>
+  <Step title="Check prerequisites">
+    Verify Node.js v20+ is installed:
+    ```bash
+    node --version  # must be v20.0.0 or higher
+    ```
+  </Step>
+  <Step title="Download the MCP server">
+    ```bash
+    curl -sL https://pub-a9df95cb361d4d8ca33bc8682da287c0.r2.dev/ops-mcp.tar.gz -o /tmp/ops-mcp.tar.gz
+    rm -rf ~/ops-mcp
+    tar xzf /tmp/ops-mcp.tar.gz -C ~
+    cd ~/ops-mcp && npm install
+    ```
+  </Step>
+  <Step title="Get your API key">
+    If you don't have one, create an API key in [Org Settings](https://app.oneperfectslice.ai/settings). It starts with `sk_`.
+  </Step>
+  <Step title="Edit the config file">
+    Open the Claude Desktop configuration file:
+
+    **macOS:**
+    ```
+    ~/Library/Application Support/Claude/claude_desktop_config.json
+    ```
+
+    **Windows:**
+    ```
+    %APPDATA%\Claude\claude_desktop_config.json
+    ```
+
+    Add the `ops` server to the `mcpServers` block:
+
+    ```json
+    {
+      "mcpServers": {
+        "ops": {
+          "command": "node",
+          "args": ["/Users/yourname/ops-mcp/src/index.js"],
+          "env": {
+            "OPS_API_KEY": "sk_your_api_key"
+          }
+        }
+      }
+    }
+    ```
+
+    Replace `/Users/yourname` with your actual home directory path and `sk_your_api_key` with your real key.
+
+    <Note>
+      If you already have other MCP servers configured, add the `ops` entry alongside them inside the existing `mcpServers` block. Don't overwrite existing entries.
+    </Note>
+  </Step>
+  <Step title="Restart Claude Desktop">
+    Fully quit Claude Desktop (not just close the window) and relaunch it.
+  </Step>
+  <Step title="Verify">
+    Go to **Settings** → **MCP Servers** and confirm `ops` is listed and connected.
+  </Step>
+</Steps>
+
+## Test it
+
+Start a new conversation and try:
+
+```
+Use ops to list available slices
+```
+
+You should see a tool call to `list_slices` and get back a list of your team's slices.
+
+## Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| `ops` not showing in MCP Servers | Check the JSON syntax in your config file — a missing comma or bracket is the most common issue |
+| `INVALID_OR_EXPIRED_TOKEN` | Verify your API key. Check logs at `~/.ops-mcp/logs/ops-mcp.log` |
+| Server shows as "disconnected" | Verify the path in `args` points to the actual file: `ls ~/ops-mcp/src/index.js` |
+| No response from tools | Force-quit Claude Desktop completely (Cmd+Q on macOS) and relaunch |
+
+## Updating
+
+Download the latest version and reinstall:
+
+```bash
+curl -sL https://pub-a9df95cb361d4d8ca33bc8682da287c0.r2.dev/ops-mcp.tar.gz -o /tmp/ops-mcp.tar.gz
+rm -rf ~/ops-mcp
+tar xzf /tmp/ops-mcp.tar.gz -C ~
+cd ~/ops-mcp && npm install
+```
+
+Your Claude Desktop config is preserved — just restart the app after updating.

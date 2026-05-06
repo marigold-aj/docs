@@ -1,81 +1,107 @@
 ---
 title: "Quickstart"
-description: "Start building awesome documentation in minutes"
-icon: 'rocket'
+description: "Get your API key and make your first API call in under 5 minutes."
+icon: "rocket"
 ---
 
-## Get started in three steps
+## 1. Get your API key
 
-Get your documentation site running locally and make your first customization.
+<Steps>
+  <Step title="Go to Org Settings">
+    Navigate to [app.oneperfectslice.ai/settings](https://app.oneperfectslice.ai/settings) and open the **API Keys** section.
+  </Step>
+  <Step title="Create a key">
+    Click **Create API Key**, give it a name, and select the team it should be scoped to. Your key will be shown once — copy it and store it securely.
+  </Step>
+</Steps>
 
-### Step 1: Set up your local environment
+<Warning>
+  API keys grant full read access to your team's data. Never expose them in client-side code, public repos, or logs.
+</Warning>
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+Your key looks like this: `sk_...` (prefixed with `sk_`).
 
-### Step 2: Deploy your changes
+## 2. Make your first request
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+List the slices available to your team:
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+```bash
+curl https://app.oneperfectslice.ai/api/public/v1/slices \
+  -H "Authorization: Bearer sk_your_api_key"
+```
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+You should get back a JSON response:
 
-### Step 3: Go live
+```json
+{
+  "data": {
+    "slices": [
+      {
+        "key": "high_intent_deals",
+        "title": "High-Intent Deals",
+        "objective": "pipeline",
+        "description": "Surfaces deals showing strong buying signals.",
+        "elementKeys": ["intent_signal", "budget_confirmation"]
+      }
+    ]
+  }
+}
+```
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+## 3. Run a slice
 
-## Next steps
+Start an analysis on recent conversations:
 
-Now that you have your docs running, explore these key features:
+```bash
+curl -X POST https://app.oneperfectslice.ai/api/public/v1/slices/high_intent_deals/run \
+  -H "Authorization: Bearer sk_your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "dateFrom": "2026-03-26T00:00:00Z",
+    "dateTo": "2026-04-26T00:00:00Z"
+  }'
+```
 
-<CardGroup cols={2}>
+This returns `202 Accepted` with a `runId`:
 
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
+```json
+{
+  "data": {
+    "runId": 12345,
+    "sliceKey": "high_intent_deals",
+    "sliceTitle": "High-Intent Deals",
+    "status": "running"
+  }
+}
+```
 
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
+## 4. Poll for results
 
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
+Check the run status until it completes:
 
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
+```bash
+curl https://app.oneperfectslice.ai/api/public/v1/slice-runs/12345 \
+  -H "Authorization: Bearer sk_your_api_key"
+```
 
-</CardGroup>
+When `status` is `"completed"`, the `result` field contains your structured insights. Use the `suggestedPollAfterSeconds` field to determine how long to wait between polls.
 
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>
+## 5. Get evidence
+
+Once a run completes, retrieve the supporting evidence:
+
+```bash
+curl https://app.oneperfectslice.ai/api/public/v1/slice-runs/12345/evidence \
+  -H "Authorization: Bearer sk_your_api_key"
+```
+
+## What's next?
+
+<Columns cols={2}>
+  <Card title="API Reference" icon="terminal" href="/api-reference">
+    Explore all 20 endpoints with parameters, examples, and response schemas.
+  </Card>
+  <Card title="MCP Server" icon="robot" href="/mcp/overview">
+    Connect OPS directly to Claude and other AI agents.
+  </Card>
+</Columns>

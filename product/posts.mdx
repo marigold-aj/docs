@@ -1,0 +1,55 @@
+---
+title: "Posts"
+description: "AI-generated summaries and scorecards from your analyzed calls."
+icon: "file-lines"
+---
+
+## What are posts?
+
+Posts are the outputs generated when OPS processes a call. Every analyzed call produces one or more posts, depending on your team's template configuration.
+
+## Post types
+
+| Type | What it contains |
+|------|-----------------|
+| **Summary** | High-level call recap — key topics discussed, decisions made, action items, and next steps |
+| **Scorecard** | Detailed performance evaluation with element-by-element scores and coaching (see [Scorecards](/product/scorecards)) |
+
+## How posts are generated
+
+1. A call is ingested into OPS (from your connected recording platform)
+2. OPS matches the call to a **call type** (discovery, demo, etc.)
+3. The appropriate templates are applied (summary, scorecard, or both)
+4. The LLM processes the transcript along with any available CRM context
+5. The result is saved as a post
+
+This happens automatically — no manual action required.
+
+## Browsing posts
+
+In the app, you can:
+- View a chronological feed of all posts for your team
+- **Filter by** call type, template type (summary/scorecard), date range, call owner, or company
+- **Search** across post content
+- Click into any post to see the full result with metadata
+
+## Post metadata
+
+Each post includes:
+- **Title** — the call name (may include an AI-generated title)
+- **Call owner** — who ran the call
+- **Company domain** — the external participant's company
+- **Template type** — summary or scorecard
+- **Timestamps** — when the call happened and when the post was created
+
+## Accessing posts via the API
+
+The API provides three post endpoints:
+
+- **Search posts** — filter and paginate across your team's posts
+- **Get post** — retrieve a single post with full detail
+- **List filters** — discover available filter values
+
+Use `detail: true` in search requests to get full post payloads, or `detail: false` (default) for compact summaries.
+
+See the [API Reference](/api-reference) for full documentation.
