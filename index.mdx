@@ -7,38 +7,34 @@ description: "Run AI-powered analysis on your sales conversations. Surface struc
   Getting started
 </div>
 
-<Columns cols={2}>
-  <div>
-    ### Developer quickstart
+### Developer quickstart
 
-    Copy this snippet to start analyzing calls. See the [full quickstart](/quickstart) for more details.
-  </div>
+Copy this snippet to start analyzing calls. See the [full quickstart](/quickstart) for more details.
 
-  <CodeGroup>
-    ```python Python
-    import requests
+<CodeGroup>
+```python Python
+import requests
 
-    resp = requests.get(
-        "https://app.oneperfectslice.ai/api/public/v1/slices",
-        headers={"Authorization": "Bearer sk_your_api_key"}
-    )
-    slices = resp.json()["data"]["slices"]
-    ```
+resp = requests.get(
+    "https://app.oneperfectslice.ai/api/public/v1/slices",
+    headers={"Authorization": "Bearer sk_your_api_key"}
+)
+slices = resp.json()["data"]["slices"]
+```
 
-    ```typescript TypeScript
-    const resp = await fetch(
-      "https://app.oneperfectslice.ai/api/public/v1/slices",
-      { headers: { Authorization: "Bearer sk_your_api_key" } }
-    );
-    const { data } = await resp.json();
-    ```
+```typescript TypeScript
+const resp = await fetch(
+  "https://app.oneperfectslice.ai/api/public/v1/slices",
+  { headers: { Authorization: "Bearer sk_your_api_key" } }
+);
+const { data } = await resp.json();
+```
 
-    ```bash cURL
-    curl https://app.oneperfectslice.ai/api/public/v1/slices \
-      -H "Authorization: Bearer sk_your_api_key"
-    ```
-  </CodeGroup>
-</Columns>
+```bash cURL
+curl https://app.oneperfectslice.ai/api/public/v1/slices \
+  -H "Authorization: Bearer sk_your_api_key"
+```
+</CodeGroup>
 
 <Columns cols={3}>
   <Card title="Product" img="/images/cards/product.png" href="/product/slices">
