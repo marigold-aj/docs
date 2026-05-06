@@ -26,59 +26,18 @@
   --accent-foreground: #261b15;
 }
 
-/* ===== Sidebar ===== */
-#sidebar {
-  background: #1f1f1f;
-  border-color: #2a2a2a;
-}
-
-#sidebar * {
-  color: #e0e0e0;
-}
-
-#sidebar a:hover,
-#sidebar [data-active="true"],
+/* ===== Sidebar — active-row pill (light Mintlify default surface) ===== */
+#sidebar a[data-active="true"],
 #sidebar .active {
-  background: #773624;
-  color: #ffffff;
+  background: rgba(240, 140, 128, 0.15);
+  color: #773624;
+  border-radius: 6px;
 }
 
-#sidebar a[data-active="true"] *,
-#sidebar .active * {
-  color: #ffffff;
-}
-
-/* Sidebar section titles */
-#sidebar [role="group"] > span,
-#sidebar .group-title {
-  color: #999999;
-}
-
-/* ===== Navbar ===== */
-#navbar {
-  background: #1f1f1f;
-  border-color: #2a2a2a;
-}
-
-#navbar * {
-  color: #ffffff;
-}
-
-#navbar a:hover {
+.dark #sidebar a[data-active="true"],
+.dark #sidebar .active {
+  background: rgba(240, 140, 128, 0.20);
   color: #f08c80;
-}
-
-/* Primary CTA button in navbar */
-#navbar [data-button="true"],
-#navbar .button {
-  background: #f08c80;
-  color: #ffffff;
-  border: none;
-}
-
-#navbar [data-button="true"]:hover,
-#navbar .button:hover {
-  background: #e87a6d;
 }
 
 /* ===== Tab navigation ===== */
@@ -243,7 +202,7 @@ td {
   border-color: #3a2e28;
 }
 
-/* ===== Scrollbar (dark sidebar) ===== */
+/* ===== Scrollbar ===== */
 #sidebar::-webkit-scrollbar {
   width: 4px;
 }
@@ -253,8 +212,12 @@ td {
 }
 
 #sidebar::-webkit-scrollbar-thumb {
-  background: #444444;
+  background: rgba(0, 0, 0, 0.15);
   border-radius: 4px;
+}
+
+.dark #sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 /* ===== Footer ===== */

@@ -1,120 +1,53 @@
 ---
-title: "One Perfect Slice Documentation"
-description: "Analyze sales conversations with AI. Surface insights, evidence, and scorecards — via the app, API, or MCP."
-mode: "wide"
+title: "Overview"
+description: "Run AI-powered analysis on your sales conversations. Surface structured insights, evidence, and scorecards — via the app, API, or MCP."
 ---
 
-<div className="not-prose">
-
-{/* ===== Hero ===== */}
-<div className="text-center py-12 px-4">
-  <h1 className="text-4xl font-bold tracking-tight mb-4" style={{color: 'var(--foreground)'}}>
-    One Perfect Slice
-  </h1>
-  <p className="text-lg max-w-2xl mx-auto" style={{color: 'var(--muted-foreground)'}}>
-    Run AI-powered analysis on your sales conversations. Surface structured insights, 
-    evidence, and scorecards — via the app, API, or MCP.
-  </p>
+<div className="text-xs font-semibold tracking-widest uppercase mb-2" style={{color: 'var(--primary)'}}>
+  Getting started
 </div>
-
-{/* ===== Quickstart Code ===== */}
-<div className="max-w-3xl mx-auto mb-16 px-4">
-
-<CodeGroup>
-```bash cURL
-curl https://app.oneperfectslice.ai/api/public/v1/slices \
-  -H "Authorization: Bearer sk_your_api_key"
-```
-
-```python Python
-import requests
-
-resp = requests.get(
-    "https://app.oneperfectslice.ai/api/public/v1/slices",
-    headers={"Authorization": "Bearer sk_your_api_key"}
-)
-slices = resp.json()["data"]["slices"]
-```
-
-```typescript TypeScript
-const resp = await fetch(
-  "https://app.oneperfectslice.ai/api/public/v1/slices",
-  { headers: { Authorization: "Bearer sk_your_api_key" } }
-);
-const { data } = await resp.json();
-```
-</CodeGroup>
-
-</div>
-
-</div>
-
-{/* ===== Getting Started ===== */}
-
-## Get Started
-
-<Columns cols={3}>
-  <Card title="Quickstart" icon="rocket" href="/quickstart">
-    Get your API key and make your first API call in under 5 minutes.
-  </Card>
-  <Card title="API Reference" icon="terminal" href="/api-reference">
-    All 20 REST endpoints with parameters, examples, and response schemas.
-  </Card>
-  <Card title="MCP Server" icon="robot" href="/mcp/overview">
-    Connect OPS to Claude Code, Claude Desktop, and other AI agents.
-  </Card>
-</Columns>
-
-## Analyze Conversations
 
 <Columns cols={2}>
-  <Card title="Slices" icon="chart-pie" href="/product/slices">
-    AI-powered analysis templates across 27 use cases — pipeline, deals, expansion, and product insights.
-  </Card>
-  <Card title="Scorecards" icon="clipboard-check" href="/product/scorecards">
-    Structured rep evaluation with element-by-element scoring and coaching feedback.
-  </Card>
-  <Card title="Posts" icon="file-lines" href="/product/posts">
-    AI-generated summaries and scorecards from every analyzed call.
-  </Card>
-  <Card title="CRM Integration" icon="plug" href="/product/crm-integration">
-    Connect HubSpot to filter by deals, companies, stages, and custom fields.
-  </Card>
-</Columns>
+  <div>
+    ### Developer quickstart
 
-## For Developers
+    Copy this snippet to start analyzing calls. See the [full quickstart](/quickstart) for more details.
+  </div>
+
+  <CodeGroup>
+    ```python Python
+    import requests
+
+    resp = requests.get(
+        "https://app.oneperfectslice.ai/api/public/v1/slices",
+        headers={"Authorization": "Bearer sk_your_api_key"}
+    )
+    slices = resp.json()["data"]["slices"]
+    ```
+
+    ```typescript TypeScript
+    const resp = await fetch(
+      "https://app.oneperfectslice.ai/api/public/v1/slices",
+      { headers: { Authorization: "Bearer sk_your_api_key" } }
+    );
+    const { data } = await resp.json();
+    ```
+
+    ```bash cURL
+    curl https://app.oneperfectslice.ai/api/public/v1/slices \
+      -H "Authorization: Bearer sk_your_api_key"
+    ```
+  </CodeGroup>
+</Columns>
 
 <Columns cols={3}>
-  <Card title="Authentication" icon="key" href="/product/api-keys">
-    Create team-scoped API keys with Argon2id security.
+  <Card title="Product" img="/images/cards/product.png" href="/product/slices">
+    Learn how slices, scorecards, and posts work.
   </Card>
-  <Card title="Run a Slice via API" icon="play" href="/quickstart#3-run-a-slice">
-    Start async analysis, poll for results, and retrieve evidence.
+  <Card title="MCP" img="/images/cards/mcp.png" href="/mcp/overview">
+    Connect OPS to Claude Code, Claude Desktop, and other agents.
   </Card>
-  <Card title="Search Posts" icon="magnifying-glass" href="/api-reference">
-    Filter and paginate across summaries and scorecards.
-  </Card>
-</Columns>
-
-<Columns cols={2}>
-  <Card title="Claude Code + MCP" icon="terminal" href="/mcp/claude-code">
-    Set up MCP in Claude Code CLI — analyze calls conversationally.
-  </Card>
-  <Card title="Claude Desktop + MCP" icon="desktop" href="/mcp/claude-desktop">
-    Set up MCP in the Claude Desktop app.
-  </Card>
-</Columns>
-
-## Resources
-
-<Columns cols={3}>
-  <Card title="OpenAPI Spec" icon="file-code" href="https://app.oneperfectslice.ai/api/public/v1/openapi.yaml">
-    Download the OpenAPI 3.1 specification.
-  </Card>
-  <Card title="Dashboard" icon="gauge" href="https://app.oneperfectslice.ai">
-    Open the OPS app.
-  </Card>
-  <Card title="Support" icon="envelope" href="mailto:support@oneperfectslice.ai">
-    Get help from the team.
+  <Card title="API" img="/images/cards/api.png" href="/quickstart">
+    Call OPS from your code — get an API key and run your first request.
   </Card>
 </Columns>
