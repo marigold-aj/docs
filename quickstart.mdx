@@ -21,18 +21,37 @@ icon: "rocket"
 
 Your key looks like this: `sk_...` (prefixed with `sk_`).
 
-## 2. Make your first request
+## 2. List available slices
 
-List the slices available to your team:
-
-```bash
+<CodeGroup>
+```bash cURL
 curl https://app.oneperfectslice.ai/api/public/v1/slices \
   -H "Authorization: Bearer sk_your_api_key"
 ```
 
-You should get back a JSON response:
+```python Python
+import requests
 
-```json
+resp = requests.get(
+    "https://app.oneperfectslice.ai/api/public/v1/slices",
+    headers={"Authorization": "Bearer sk_your_api_key"}
+)
+slices = resp.json()["data"]["slices"]
+for s in slices:
+    print(f"{s['key']}: {s['title']}")
+```
+
+```typescript TypeScript
+const resp = await fetch(
+  "https://app.oneperfectslice.ai/api/public/v1/slices",
+  { headers: { Authorization: "Bearer sk_your_api_key" } }
+);
+const { data } = await resp.json();
+console.log(data.slices);
+```
+</CodeGroup>
+
+```json Response
 {
   "data": {
     "slices": [
@@ -50,21 +69,63 @@ You should get back a JSON response:
 
 ## 3. Run a slice
 
-Start an analysis on recent conversations:
+Start an async analysis on recent conversations:
 
-```bash
+<CodeGroup>
+```bash cURL
 curl -X POST https://app.oneperfectslice.ai/api/public/v1/slices/high_intent_deals/run \
   -H "Authorization: Bearer sk_your_api_key" \
   -H "Content-Type: application/json" \
+  -H "Idempotency-Key: my-unique-key-123" \
   -d '{
     "dateFrom": "2026-03-26T00:00:00Z",
     "dateTo": "2026-04-26T00:00:00Z"
   }'
 ```
 
+```python Python
+import requests
+
+resp = requests.post(
+    "https://app.oneperfectslice.ai/api/public/v1/slices/high_intent_deals/run",
+    headers={
+        "Authorization": "Bearer sk_your_api_key",
+        "Content-Type": "application/json",
+        "Idempotency-Key": "my-unique-key-123",
+    },
+    json={
+        "dateFrom": "2026-03-26T00:00:00Z",
+        "dateTo": "2026-04-26T00:00:00Z",
+    },
+)
+run = resp.json()["data"]
+print(f"Run {run['runId']} started — status: {run['status']}")
+```
+
+```typescript TypeScript
+const resp = await fetch(
+  "https://app.oneperfectslice.ai/api/public/v1/slices/high_intent_deals/run",
+  {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer sk_your_api_key",
+      "Content-Type": "application/json",
+      "Idempotency-Key": "my-unique-key-123",
+    },
+    body: JSON.stringify({
+      dateFrom: "2026-03-26T00:00:00Z",
+      dateTo: "2026-04-26T00:00:00Z",
+    }),
+  }
+);
+const { data } = await resp.json();
+console.log(`Run ${data.runId} started — status: ${data.status}`);
+```
+</CodeGroup>
+
 This returns `202 Accepted` with a `runId`:
 
-```json
+```json Response
 {
   "data": {
     "runId": 12345,
@@ -77,31 +138,139 @@ This returns `202 Accepted` with a `runId`:
 
 ## 4. Poll for results
 
-Check the run status until it completes:
+Check the run status until it completes. Use `suggestedPollAfterSeconds` to determine wait time.
 
-```bash
+<CodeGroup>
+```bash cURL
 curl https://app.oneperfectslice.ai/api/public/v1/slice-runs/12345 \
   -H "Authorization: Bearer sk_your_api_key"
 ```
 
-When `status` is `"completed"`, the `result` field contains your structured insights. Use the `suggestedPollAfterSeconds` field to determine how long to wait between polls.
+```python Python
+import time, requests
+
+headers = {"Authorization": "Bearer sk_your_api_key"}
+
+while True:
+    resp = requests.get(
+        "https://app.oneperfectslice.ai/api/public/v1/slice-runs/12345",
+        headers=headers,
+    )
+    run = resp.json()["data"]
+
+    if run["status"] == "completed":
+        print("Done!", run["result"])
+        break
+    elif run["status"] == "failed":
+        print("Failed:", run["error"])
+        break
+
+    wait = run.get("suggestedPollAfterSeconds", 15)
+    print(f"Status: {run['status']} — polling again in {wait}s")
+    time.sleep(wait)
+```
+
+```typescript TypeScript
+const headers = { Authorization: "Bearer sk_your_api_key" };
+
+while (true) {
+  const resp = await fetch(
+    "https://app.oneperfectslice.ai/api/public/v1/slice-runs/12345",
+    { headers }
+  );
+  const { data: run } = await resp.json();
+
+  if (run.status === "completed") {
+    console.log("Done!", run.result);
+    break;
+  } else if (run.status === "failed") {
+    console.log("Failed:", run.error);
+    break;
+  }
+
+  const wait = (run.suggestedPollAfterSeconds ?? 15) * 1000;
+  console.log(`Status: ${run.status} — polling in ${wait / 1000}s`);
+  await new Promise((r) => setTimeout(r, wait));
+}
+```
+</CodeGroup>
 
 ## 5. Get evidence
 
 Once a run completes, retrieve the supporting evidence:
 
-```bash
+<CodeGroup>
+```bash cURL
 curl https://app.oneperfectslice.ai/api/public/v1/slice-runs/12345/evidence \
   -H "Authorization: Bearer sk_your_api_key"
 ```
 
+```python Python
+resp = requests.get(
+    "https://app.oneperfectslice.ai/api/public/v1/slice-runs/12345/evidence",
+    headers={"Authorization": "Bearer sk_your_api_key"},
+)
+evidence = resp.json()["data"]
+for key, element in evidence["elements"].items():
+    print(f"{key}: {element['count']} items")
+    for item in element["items"]:
+        print(f"  \"{item['quote']}\" (confidence: {item['confidence']})")
+```
+
+```typescript TypeScript
+const resp = await fetch(
+  "https://app.oneperfectslice.ai/api/public/v1/slice-runs/12345/evidence",
+  { headers: { Authorization: "Bearer sk_your_api_key" } }
+);
+const { data } = await resp.json();
+for (const [key, element] of Object.entries(data.elements)) {
+  console.log(`${key}: ${element.count} items`);
+  element.items.forEach((item) =>
+    console.log(`  "${item.quote}" (confidence: ${item.confidence})`)
+  );
+}
+```
+</CodeGroup>
+
+```json Response
+{
+  "data": {
+    "summary": {
+      "totalSources": 15,
+      "totalElements": 2,
+      "sourceBreakdown": { "transcript": 12, "crm_deal": 3 }
+    },
+    "elements": {
+      "intent_signal": {
+        "count": 8,
+        "items": [
+          {
+            "quote": "We're aiming to have a vendor selected by end of Q2.",
+            "source": {
+              "type": "transcript",
+              "id": "file:98123",
+              "label": "Acme Corp — Discovery Call",
+              "date": "2026-04-12"
+            },
+            "confidence": 0.91
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
 ## What's next?
 
-<Columns cols={2}>
+<Columns cols={3}>
   <Card title="API Reference" icon="terminal" href="/api-reference">
-    Explore all 20 endpoints with parameters, examples, and response schemas.
+    Explore all 20 endpoints with full schemas.
   </Card>
   <Card title="MCP Server" icon="robot" href="/mcp/overview">
-    Connect OPS directly to Claude and other AI agents.
+    Connect OPS to Claude and other AI agents.
+  </Card>
+  <Card title="Search Posts" icon="magnifying-glass" href="/product/posts">
+    Find summaries and scorecards across your calls.
   </Card>
 </Columns>
