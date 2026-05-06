@@ -2,16 +2,33 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "One Perfect Slice",
+  "appearance": "system",
   "colors": {
-    "primary": "#6366f1",
-    "light": "#818cf8",
-    "dark": "#4f46e5"
+    "primary": "#773624",
+    "light": "#F08C80",
+    "dark": "#261B15",
+    "background": {
+      "light": "#FFFFFF",
+      "dark": "#0f1117"
+    }
   },
-  "favicon": "/favicon.svg",
+  "font": {
+    "headings": {
+      "family": "Yantramanav",
+      "weight": 700,
+      "url": "https://fonts.googleapis.com/css2?family=Yantramanav:wght@400;500;600;700&display=swap"
+    },
+    "body": {
+      "family": "Yantramanav",
+      "weight": 400,
+      "url": "https://fonts.googleapis.com/css2?family=Yantramanav:wght@400;500;600;700&display=swap"
+    }
+  },
+  "favicon": "/favicon.png",
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Getting Started",
         "groups": [
           {
             "group": "Getting Started",
@@ -19,7 +36,12 @@
               "index",
               "quickstart"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "tab": "Product",
+        "groups": [
           {
             "group": "Product",
             "pages": [
@@ -33,12 +55,15 @@
         ]
       },
       {
-        "tab": "API Reference",
-        "openapi": "api/openapi.yaml"
-      },
-      {
-        "tab": "MCP",
+        "tab": "Developers",
         "groups": [
+          {
+            "group": "API Reference",
+            "pages": [
+              "quickstart"
+            ],
+            "openapi": "api/openapi.yaml"
+          },
           {
             "group": "MCP Server",
             "pages": [
@@ -53,14 +78,9 @@
     "global": {
       "anchors": [
         {
-          "anchor": "API Reference",
-          "href": "/api-reference",
+          "anchor": "Developers",
+          "href": "/quickstart",
           "icon": "terminal"
-        },
-        {
-          "anchor": "MCP",
-          "href": "/mcp/overview",
-          "icon": "robot"
         }
       ]
     }
