@@ -26,7 +26,7 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Getting Started",
+        "tab": "Docs",
         "groups": [
           {
             "group": "Getting Started",
@@ -34,55 +34,68 @@
               "index",
               "quickstart"
             ]
-          }
-        ]
-      },
-      {
-        "tab": "Product",
-        "groups": [
+          },
           {
             "group": "Product",
             "pages": [
               "product/slices",
               "product/scorecards",
-              "product/posts",
-              "product/crm-integration",
-              "product/api-keys"
+              "product/posts"
+            ]
+          },
+          {
+            "group": "Integrations",
+            "pages": [
+              "integrations/hubspot"
             ]
           }
         ]
       },
       {
-        "tab": "Developers",
+        "tab": "MCP",
         "groups": [
           {
-            "group": "API Reference",
+            "group": "Get started",
             "pages": [
-              "quickstart"
-            ],
-            "openapi": "api/openapi.yaml"
+              "mcp/overview"
+            ]
           },
           {
-            "group": "MCP Server",
+            "group": "Setup",
             "pages": [
-              "mcp/overview",
               "mcp/claude-code",
               "mcp/claude-desktop"
             ]
           }
         ]
+      },
+      {
+        "tab": "API",
+        "groups": [
+          {
+            "group": "API Reference",
+            "pages": [
+              "api/authentication"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "openapi": "api/openapi.yaml"
+          }
+        ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Developers",
-          "href": "/quickstart",
-          "icon": "terminal"
-        }
-      ]
-    }
+    ]
   },
+  "redirects": [
+    {
+      "source": "/product/crm-integration",
+      "destination": "/integrations/hubspot"
+    },
+    {
+      "source": "/product/api-keys",
+      "destination": "/api/authentication"
+    }
+  ],
   "logo": {
     "light": "/logo/light.svg",
     "dark": "/logo/dark.svg"

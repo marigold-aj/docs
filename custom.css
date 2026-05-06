@@ -26,6 +26,30 @@
   --accent-foreground: #261b15;
 }
 
+/* ===== Group breadcrumb above page H1 — together.ai-style eyebrow ===== */
+/* Defensive selectors — Mintlify's exact class name varies by version */
+main header > div:first-child,
+main header > p:first-child,
+main header > span:first-child,
+[data-section-label],
+[data-eyebrow],
+.eyebrow {
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+  color: #773624 !important;
+}
+
+.dark main header > div:first-child,
+.dark main header > p:first-child,
+.dark main header > span:first-child,
+.dark [data-section-label],
+.dark [data-eyebrow],
+.dark .eyebrow {
+  color: #f08c80 !important;
+}
+
 /* ===== Sidebar — active-row pill (light Mintlify default surface) ===== */
 #sidebar a[data-active="true"],
 #sidebar .active {
