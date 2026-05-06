@@ -1,0 +1,106 @@
+---
+title: "Errors"
+description: "Error codes, HTTP statuses, and how to handle failures."
+---
+
+When a request fails, the API returns a JSON error envelope:
+
+```json
+{
+  "error": {
+    "code": "INVALID_FILTERS",
+    "message": "Filter validation failed",
+    "details": {
+      "field": "crmDealStages",
+      "maxAllowed": 100,
+      "validValuesEndpoint": "/api/public/v1/filters/crm-deal-stages"
+    }
+  }
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `code` | string | Machine-readable UPPER_SNAKE_CASE error code |
+| `message` | string | Human-readable description |
+| `details` | object \| null | Optional additional context |
+
+## HTTP status codes
+
+| Status | Meaning |
+|--------|---------|
+| **200** | Success |
+| **202** | Accepted — async operation started (slice runs) |
+| **400** | Bad request — invalid parameters or filters |
+| **401** | Unauthorized — invalid or missing API key |
+| **403** | Forbidden — usage limit exceeded |
+| **404** | Resource not found |
+| **409** | Conflict — idempotency key mismatch or run not completed |
+| **429** | Concurrency limit exceeded |
+| **503** | Temporary unavailability or timeout |
+
+## Authentication errors (401)
+
+| Code | Message |
+|------|---------|
+| `MISSING_TOKEN` | Authorization header with Bearer token is required |
+| `INVALID_TOKEN` | Token is invalid |
+| `TOKEN_REVOKED` | Token has been revoked |
+| `TOKEN_EXPIRED` | Token has expired |
+
+## Validation errors (400)
+
+| Code | Message |
+|------|---------|
+| `INVALID_REQUEST` | Malformed JSON body |
+| `INVALID_FILTERS` | Filter validation failed |
+| `DATE_RANGE_TOO_WIDE` | Maximum lookback is 90 days from today |
+| `FILTER_ARRAY_TOO_LARGE` | Filter array exceeds maximum size |
+| `INVALID_IDEMPOTENCY_KEY` | Idempotency key must be between 1 and 255 characters |
+
+## Resource errors (404)
+
+| Code | Message |
+|------|---------|
+| `SLICE_NOT_FOUND` | Slice not found |
+| `RUN_NOT_FOUND` | Run not found |
+
+<Note>
+  Resources belonging to a different organization return 404, not 403, to prevent existence leakage.
+</Note>
+
+## Conflict errors (409)
+
+| Code | Message |
+|------|---------|
+| `IDEMPOTENCY_KEY_CONFLICT` | Idempotency key was already used with different arguments |
+| `RUN_NOT_COMPLETED` | Evidence is only available for completed runs |
+
+## Limit errors (403 / 429)
+
+| Code | HTTP | Message |
+|------|------|---------|
+| `USAGE_LIMIT_EXCEEDED` | 403 | Monthly usage limit for AI insights runs has been exceeded |
+| `CONCURRENT_RUN_LIMIT` | 429 | Maximum of 5 concurrent slice runs per team |
+
+## Timeout errors (503)
+
+| Code | Message |
+|------|---------|
+| `PREVIEW_COUNT_TIMEOUT` | Preview count request timed out |
+| `RUN_LIST_TIMEOUT` | Run history request timed out |
+| `RUN_LOOKUP_TIMEOUT` | Run lookup request timed out |
+| `EVIDENCE_TIMEOUT` | Evidence request timed out |
+| `POST_SEARCH_TIMEOUT` | Post search request timed out |
+| `FILTER_LOOKUP_TIMEOUT` | Filter lookup request timed out |
+| `BILLING_UNAVAILABLE` | Usage gating is temporarily unavailable |
+| `IDEMPOTENCY_KEY_IN_PROGRESS` | A run for this Idempotency-Key is currently being created |
+
+## Handling errors
+
+- **401** — check your API key is valid and not revoked
+- **400** — fix request parameters; use filter discovery endpoints to find valid values
+- **404** — verify the resource ID and that your key has access
+- **409** — for idempotency conflicts, use a new key; for evidence, wait for the run to complete
+- **429** — wait for existing runs to finish before starting new ones
+- **503** — retry with exponential backoff

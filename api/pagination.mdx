@@ -1,0 +1,99 @@
+---
+title: "Pagination"
+description: "How to page through large result sets."
+---
+
+List endpoints use **offset-based pagination** with `limit` and `offset` parameters.
+
+## Request parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `limit` | integer | 20 | Number of results per page (1 to 100) |
+| `offset` | integer | 0 | Number of results to skip |
+
+## Response metadata
+
+Paginated responses include a `meta.pagination` object:
+
+```json
+{
+  "data": [ ... ],
+  "meta": {
+    "pagination": {
+      "totalCount": 142,
+      "hasMore": true,
+      "limit": 20,
+      "offset": 0
+    }
+  }
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `totalCount` | integer | Total number of results across all pages |
+| `hasMore` | boolean | Whether more results exist beyond the current page |
+| `limit` | integer | Number of results per page (echoed from request) |
+| `offset` | integer | Current offset into the result set (echoed from request) |
+
+## Paginated endpoints
+
+- `GET /slice-runs` — list run history
+- `POST /posts/search` — search posts
+
+## Example
+
+<CodeGroup>
+```bash cURL
+# First page
+curl "https://app.oneperfectslice.ai/api/public/v1/slice-runs?limit=20&offset=0" \
+  -H "Authorization: Bearer sk_your_api_key"
+
+# Second page
+curl "https://app.oneperfectslice.ai/api/public/v1/slice-runs?limit=20&offset=20" \
+  -H "Authorization: Bearer sk_your_api_key"
+```
+
+```python Python
+import requests
+
+headers = {"Authorization": "Bearer sk_your_api_key"}
+base = "https://app.oneperfectslice.ai/api/public/v1/slice-runs"
+
+all_runs = []
+offset = 0
+limit = 20
+
+while True:
+    resp = requests.get(base, headers=headers, params={"limit": limit, "offset": offset})
+    body = resp.json()
+    all_runs.extend(body["data"])
+
+    if not body["meta"]["pagination"]["hasMore"]:
+        break
+    offset += limit
+
+print(f"Fetched {len(all_runs)} runs")
+```
+
+```typescript TypeScript
+const headers = { Authorization: "Bearer sk_your_api_key" };
+const base = "https://app.oneperfectslice.ai/api/public/v1/slice-runs";
+
+const allRuns = [];
+let offset = 0;
+const limit = 20;
+
+while (true) {
+  const resp = await fetch(`${base}?limit=${limit}&offset=${offset}`, { headers });
+  const body = await resp.json();
+  allRuns.push(...body.data);
+
+  if (!body.meta.pagination.hasMore) break;
+  offset += limit;
+}
+
+console.log(`Fetched ${allRuns.length} runs`);
+```
+</CodeGroup>

@@ -1,0 +1,48 @@
+---
+title: "Rate Limiting"
+description: "Concurrency limits and how to handle throttling."
+---
+
+## Concurrency limits
+
+The OPS API enforces a concurrency limit on slice runs:
+
+| Limit | Value |
+|-------|-------|
+| Concurrent slice runs per team | **5** |
+
+Attempting to start a 6th concurrent run returns `429` with the error code `CONCURRENT_RUN_LIMIT`:
+
+```json
+{
+  "error": {
+    "code": "CONCURRENT_RUN_LIMIT",
+    "message": "Maximum of 5 concurrent slice runs per team. Wait for existing runs to complete."
+  }
+}
+```
+
+## Request rate limits
+
+The API does not currently enforce per-request rate limits. When usage-based limits are introduced, this page will be updated with:
+
+- Per-token request limits and window duration
+- Rate limit headers (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`)
+- Recommended backoff strategy
+
+Clients should be prepared to handle `429 Too Many Requests` responses.
+
+## Timeouts
+
+Several endpoints have server-side timeouts. If a request takes too long, the API returns `503` with a descriptive error code:
+
+| Error Code | Endpoint | Meaning |
+|------------|----------|---------|
+| `PREVIEW_COUNT_TIMEOUT` | Preview count | Filter count query timed out |
+| `RUN_LIST_TIMEOUT` | List runs | Run history query timed out |
+| `RUN_LOOKUP_TIMEOUT` | Get run | Run detail query timed out |
+| `EVIDENCE_TIMEOUT` | Get evidence | Evidence retrieval timed out |
+| `POST_SEARCH_TIMEOUT` | Search posts | Post search timed out |
+| `FILTER_LOOKUP_TIMEOUT` | Filter endpoints | Filter lookup timed out |
+
+For `503` errors, retry with exponential backoff.

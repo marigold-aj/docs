@@ -1,0 +1,107 @@
+---
+title: "Data Models"
+description: "Core entities and how they relate to each other."
+---
+
+## Entity relationships
+
+```
+Slice (analysis template)
+  └── Run (one execution of a slice)
+        ├── Result (structured output conforming to slice's outputSchema)
+        └── Evidence (quotes from transcripts and CRM records)
+
+Call Type (category of call, e.g. "Discovery Call")
+  └── Post (AI-generated output from a processed call)
+        ├── Summary (high-level call recap)
+        └── Scorecard (element-by-element performance evaluation)
+```
+
+## Slices
+
+A slice is a pre-built AI analysis template. Each slice has a business objective (pipeline, deals, expand, or product) and evaluates conversations against a set of **elements** (e.g., "budget confirmation", "competitive mention").
+
+| Field | Description |
+|-------|-------------|
+| `key` | Unique identifier (e.g., `high_intent_deals`) |
+| `title` | Human-readable name |
+| `objective` | Business category: `pipeline`, `deals`, `expand`, `product` |
+| `elementKeys` | Elements this slice evaluates |
+| `outputSchema` | JSON schema defining the structured output |
+| `preferredModel` | LLM model used for analysis |
+| `evidenceGrouping` | How evidence is organized: `ByElement` or `ByAccount` |
+
+## Runs
+
+A run is one execution of a slice. Runs are asynchronous — you start one and poll for completion.
+
+| Field | Description |
+|-------|-------------|
+| `id` | Unique run identifier |
+| `status` | `pending`, `running`, `completed`, `failed` |
+| `phase` | Execution phase: `queued` &rarr; `gathering_evidence` &rarr; `analyzing_calls` &rarr; `synthesizing` &rarr; `completed` |
+| `matchedCallCount` | Number of calls matching the filters |
+| `callsAnalyzed` | Number of calls analyzed so far |
+| `result` | Structured output (null until completed) |
+| `suggestedPollAfterSeconds` | Recommended polling interval |
+
+## Evidence
+
+Evidence items are the supporting data behind a run's results. Each item is a quote from a transcript or CRM record, grouped by element.
+
+| Field | Description |
+|-------|-------------|
+| `quote` | Extracted text from the source |
+| `source.type` | Source type (e.g., `transcript`, `crm_deal`) |
+| `source.id` | Source identifier (e.g., `file:98123`) |
+| `source.label` | Human-readable label (e.g., "Acme Corp — Discovery Call") |
+| `confidence` | Confidence score (0.0 to 1.0) |
+
+Evidence is capped at **20 items per element** per run.
+
+## Posts
+
+Posts are AI-generated outputs from processed calls. Two types:
+
+| Type | Description |
+|------|-------------|
+| **Summary** | High-level call recap with key topics, decisions, and next steps |
+| **Scorecard** | Element-by-element performance evaluation with scores and coaching |
+
+| Field | Description |
+|-------|-------------|
+| `postId` | Post identifier |
+| `fileId` | Underlying call identifier (use to deduplicate summary + scorecard for same call) |
+| `templateType` | `summary` or `scorecard` |
+| `title` | Call title |
+| `result` | Structured post payload |
+| `callOwnerEmail` | Who ran the call |
+| `companyDomain` | External participant's company |
+
+## Call Types
+
+Call types categorize your conversations (e.g., "Discovery Call", "Demo", "QBR").
+
+| Field | Description |
+|-------|-------------|
+| `key` | Unique identifier (e.g., `discovery_call`) |
+| `label` | Human-readable name |
+| `description` | What this call type represents |
+| `numCalls` | Number of calls with this type |
+
+## Elements
+
+Elements are the specific things a slice evaluates (e.g., "budget confirmation", "competitive mention").
+
+| Field | Description |
+|-------|-------------|
+| `key` | Unique identifier (e.g., `budget_confirmation`) |
+| `label` | Human-readable name |
+| `description` | What this element detects |
+
+## Scoping
+
+| Entity | Scope | Meaning |
+|--------|-------|---------|
+| Slices, Runs, Posts, Call Types, Elements | **Team** | Visible to the API key's team only |
+| CRM Deals, Companies, Stages, Fields | **Org** | Shared across teams (CRM is org-level) |

@@ -1,53 +1,67 @@
 ---
-title: "API Keys"
-description: "Create and manage API keys for programmatic access to OPS."
-icon: "key"
+title: "Authentication"
+description: "API key authentication for the OPS Public API."
 ---
 
-## Overview
+All API requests must include a team-scoped API key as a Bearer token in the `Authorization` header.
 
-API keys let you access the OPS Public API programmatically. Each key is scoped to a specific team and grants read access to that team's data.
+```bash
+curl https://app.oneperfectslice.ai/api/public/v1/slices \
+  -H "Authorization: Bearer sk_your_api_key"
+```
 
-Keys are prefixed with `sk_` and authenticate via the `Authorization: Bearer` header.
+## API keys
 
-## Creating an API key
+API keys are prefixed with `sk_` and scoped to a single team. A key for Team A cannot access Team B's data.
+
+### Creating a key
 
 <Steps>
   <Step title="Open Org Settings">
-    Navigate to **Organization Settings** → **API Keys**. You'll need Org Admin permissions.
+    Navigate to [app.oneperfectslice.ai/settings](https://app.oneperfectslice.ai/settings) and open the **API Keys** section. You'll need Org Admin permissions.
   </Step>
   <Step title="Create a key">
     Click **Create API Key**. Provide a name (e.g., "Production" or "MCP Server") and select the team it should be scoped to.
   </Step>
   <Step title="Copy the key">
-    Your key will be displayed **once**. Copy it immediately and store it in a secure location (e.g., a password manager or environment variable).
+    Your key will be displayed **once**. Copy it immediately and store it securely (e.g., a password manager or environment variable).
   </Step>
 </Steps>
 
 <Warning>
-  The raw key value is never stored by OPS — only a secure hash. If you lose it, you'll need to create a new one.
+  The raw key value is never stored by OPS — only an Argon2id hash. If you lose it, you'll need to create a new one.
 </Warning>
 
-## Managing keys
+### Managing keys
 
-From the API Keys page, you can see all keys for your organization:
+From the API Keys page you can see all keys for your organization:
 
-- **Name** — the label you gave the key
+- **Name** — the label you assigned
 - **Team** — which team the key is scoped to
 - **Last used** — when the key was last used for an API call
 - **Revoke** — permanently disable the key
 
-## Security
+## Authentication errors
 
-- Keys are stored using **Argon2id** hashing (the same algorithm used for passwords)
+| Code | HTTP | Meaning |
+|------|------|---------|
+| `MISSING_TOKEN` | 401 | `Authorization` header with Bearer token is required |
+| `INVALID_TOKEN` | 401 | Token is not recognized |
+| `TOKEN_REVOKED` | 401 | Token has been revoked in Org Settings |
+| `TOKEN_EXPIRED` | 401 | Token has passed its expiration date |
+
+## Security details
+
+- Keys are stored using **Argon2id** hashing
 - Token verification uses constant-time comparison to prevent timing attacks
-- Keys are team-scoped — a key for Team A cannot access Team B's data
+- Keys are team-scoped — cross-team access is not possible
+- Resources belonging to a different org return `404`, not `403` (no existence leakage)
 - Revoked keys are immediately invalidated
 
 ## Best practices
 
 - Create separate keys for different use cases (e.g., one for your integration, one for MCP)
 - Rotate keys periodically
-- Never commit keys to source control
-- Use environment variables to store keys in your applications
-- Revoke keys immediately if they may have been exposed
+- Never commit keys to source control or expose them in client-side code
+- Use environment variables in your applications
+- Revoke keys immediately if they may have been compromised

@@ -1,0 +1,244 @@
+/* OPS Brand Overrides — minimal CSS that augments the Almond theme */
+/* Note: NEVER override --background, --background-light, --foreground, --primary etc. */
+/* Those are Mintlify's variables, set by docs.json. Overriding them breaks the theme. */
+
+/* ===== Main content card radius (override Almond's rounded-2xl = 16px) ===== */
+#content-container {
+  border-radius: 8px !important;
+}
+
+/* ===== Page background behind the content card ===== */
+/* Almond renders this as a fixed full-viewport layer at #almond-background-color */
+#almond-background-color {
+  background: #261b15 !important;
+}
+
+.dark #almond-background-color {
+  background: #000000 !important;
+}
+
+/* ===== Topbar + Sidebar chrome ===== */
+/* Light mode: plum (brand brown #773624) */
+/* Dark mode: near-black (#0a0a0a)         */
+
+/* Light mode (default) — plum */
+#sidebar-content,
+#navbar {
+  background: #261b15 !important;
+}
+
+/* Dark mode — black */
+.dark #sidebar-content,
+.dark #navbar {
+  background: #000000 !important;
+}
+
+/* ----- Sidebar text + interactive states ----- */
+#sidebar-content,
+#sidebar-content a,
+#sidebar-content button,
+#sidebar-content h5,
+#sidebar-content span {
+  color: #f5f1f0 !important;
+}
+
+/* Group headers ("Getting Started", "Product") — slightly muted */
+#sidebar-content .sidebar-group-header h5 {
+  color: rgba(245, 241, 240, 0.65) !important;
+}
+
+/* Inactive item hover */
+#sidebar-content a:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+/* Active item — salmon pill, white text + icon */
+#sidebar-content li[data-active="true"] > a,
+#sidebar-content a[aria-current="page"] {
+  background: #F08C80 !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+}
+
+/* Icon override so it picks up the white color cleanly */
+#sidebar-content li[data-active="true"] > a svg,
+#sidebar-content a[aria-current="page"] svg,
+#sidebar-content li[data-active="true"] > a [data-icon],
+#sidebar-content a[aria-current="page"] [data-icon] {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* Search bar */
+#sidebar-content #search-bar-entry {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #f5f1f0 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+#sidebar-content #search-bar-entry:hover {
+  background: rgba(255, 255, 255, 0.10) !important;
+  border-color: rgba(255, 255, 255, 0.20) !important;
+}
+
+/* Ask AI button */
+#sidebar-content #assistant-entry {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+#sidebar-content #assistant-entry:hover {
+  background: rgba(255, 255, 255, 0.10) !important;
+}
+
+#sidebar-content #assistant-entry svg {
+  color: #f5f1f0 !important;
+}
+
+/* ----- Navbar text ----- */
+#navbar *,
+header[role="banner"] *,
+[data-navbar] * {
+  color: #f5f1f0;
+}
+
+/* Active topbar tab — keep contrast against chrome */
+#navbar .nav-tabs-item[data-active="true"] {
+  color: #ffffff !important;
+}
+
+/* ===== Links ===== */
+a {
+  color: #773624;
+}
+
+a:hover {
+  color: #99341d;
+}
+
+.dark a {
+  color: #f08c80;
+}
+
+.dark a:hover {
+  color: #edbf86;
+}
+
+/* ===== Code blocks ===== */
+pre {
+  border-radius: 8px;
+  border: 1px solid #f5f1f0;
+}
+
+.dark pre {
+  border-color: #3a2e28;
+  background: #1a1614;
+}
+
+/* Inline code */
+:not(pre) > code {
+  background: #f8f6f5;
+  color: #773624;
+  border: 1px solid #f5f1f0;
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+.dark :not(pre) > code {
+  background: #2a2019;
+  color: #f08c80;
+  border-color: #3a2e28;
+}
+
+/* ===== Cards ===== */
+[data-card],
+.card {
+  border-color: #f5f1f0;
+  transition: all 0.2s ease-in-out;
+}
+
+[data-card]:hover,
+.card:hover {
+  border-color: #f08c80;
+  box-shadow: 0 4px 12px rgba(240, 140, 128, 0.1);
+}
+
+.dark [data-card],
+.dark .card {
+  border-color: #3a2e28;
+}
+
+.dark [data-card]:hover,
+.dark .card:hover {
+  border-color: #f08c80;
+  box-shadow: 0 4px 12px rgba(240, 140, 128, 0.15);
+}
+
+/* ===== Method badges (API reference) ===== */
+[data-method="GET"],
+.get-badge {
+  color: #10a690;
+  background: #e6f7f5;
+}
+
+[data-method="POST"],
+.post-badge {
+  color: #773624;
+  background: #fef0ee;
+}
+
+[data-method="DELETE"],
+.delete-badge {
+  color: #99341d;
+  background: #fef0ee;
+}
+
+/* ===== Callouts / Alerts ===== */
+[data-callout="info"] {
+  border-color: #10a690;
+  background: #e6f7f5;
+}
+
+[data-callout="warning"] {
+  border-color: #edbf86;
+  background: #fdf1e0;
+}
+
+[data-callout="danger"],
+[data-callout="error"] {
+  border-color: #99341d;
+  background: #fef0ee;
+}
+
+.dark [data-callout="info"] {
+  background: rgba(16, 166, 144, 0.1);
+}
+
+.dark [data-callout="warning"] {
+  background: rgba(237, 191, 134, 0.1);
+}
+
+.dark [data-callout="danger"],
+.dark [data-callout="error"] {
+  background: rgba(153, 52, 29, 0.15);
+}
+
+/* ===== Tables ===== */
+th {
+  background: #f8f6f5;
+  color: #261b15;
+}
+
+.dark th {
+  background: #261b15;
+  color: #f5f1f0;
+}
+
+td {
+  border-color: #f5f1f0;
+}
+
+.dark td {
+  border-color: #3a2e28;
+}

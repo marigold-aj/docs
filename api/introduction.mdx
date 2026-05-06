@@ -1,0 +1,64 @@
+---
+title: "Introduction"
+description: "Programmatic access to One Perfect Slice — slices, runs, posts, and evidence."
+---
+
+The OPS Public API is a REST API that returns JSON. Use it to run AI-powered analysis on your sales conversations, poll for results, search posts, and retrieve evidence.
+
+**Base URL**
+
+```
+https://app.oneperfectslice.ai/api/public/v1
+```
+
+All requests require a Bearer token — see [Authentication](/api/authentication).
+
+## Response envelope
+
+All successful responses wrap data in a standard envelope:
+
+```json
+{
+  "data": { ... },
+  "meta": {
+    "pagination": {
+      "totalCount": 142,
+      "hasMore": true,
+      "limit": 20,
+      "offset": 0
+    }
+  }
+}
+```
+
+The `meta` field is only present on paginated endpoints. Non-paginated endpoints return `{ "data": { ... } }` only.
+
+## Error envelope
+
+Error responses use a separate structure with a machine-readable `code` (UPPER_SNAKE_CASE) and a human-readable `message`:
+
+```json
+{
+  "error": {
+    "code": "INVALID_TOKEN",
+    "message": "Token is invalid",
+    "details": {}
+  }
+}
+```
+
+The `details` field is optional and provides additional context for certain errors. See [Errors](/api/errors) for the full list of error codes.
+
+## Endpoint groups
+
+| Group | Description |
+|-------|-------------|
+| [Slices](/api/slices) | List, inspect, preview, and run AI analysis templates |
+| [Slice Runs](/api/slice-runs) | Poll run status, retrieve results and evidence |
+| [Posts](/api/posts) | Search and retrieve AI-generated summaries and scorecards |
+| [Reference Data](/api/reference) | Call types and elements for your team |
+| [Filters](/api/filters) | Typeahead endpoints for building filter UIs |
+
+## Quickstart
+
+For a step-by-step walkthrough, see the [Quickstart](/quickstart).

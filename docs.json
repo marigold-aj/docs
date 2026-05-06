@@ -1,6 +1,9 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "maple",
+  "theme": "almond",
+  "styling": {
+    "css": ["/style.css"]
+  },
   "name": "One Perfect Slice",
   "appearance": {
     "default": "system"
@@ -9,6 +12,12 @@
     "primary": "#773624",
     "light": "#F08C80",
     "dark": "#261B15"
+  },
+  "background": {
+    "color": {
+      "light": "#ffffff",
+      "dark": "#1a1614"
+    }
   },
   "font": {
     "headings": {
@@ -73,14 +82,24 @@
         "tab": "API",
         "groups": [
           {
-            "group": "API Reference",
+            "group": "Overview",
             "pages": [
-              "api/authentication"
+              "api/introduction",
+              "api/authentication",
+              "api/rate-limiting",
+              "api/pagination",
+              "api/errors"
             ]
           },
           {
             "group": "Endpoints",
             "openapi": "api/openapi.yaml"
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api/data-models"
+            ]
           }
         ]
       }
@@ -97,21 +116,8 @@
     }
   ],
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
-  "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:support@oneperfectslice.ai"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://app.oneperfectslice.ai"
-    }
+    "light": "https://cdn.prod.website-files.com/6798f568c3016c7a6d112142/679d400304f43a0293bc36b1_oneperfectslice-logo.svg",
+    "dark": "https://cdn.prod.website-files.com/6798f568c3016c7a6d112142/679d400304f43a0293bc36b1_oneperfectslice-logo.svg"
   },
   "footer": {
     "socials": {
