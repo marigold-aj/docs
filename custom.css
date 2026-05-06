@@ -26,6 +26,26 @@
   --accent-foreground: #261b15;
 }
 
+/* ===== Floating content card — round the top-left corner where chrome meets content ===== */
+/* Defensive selectors for the main content container */
+#content-area,
+main[role="main"],
+main > article,
+.content-area,
+[data-content-area] {
+  border-top-left-radius: 16px !important;
+  background: #ffffff !important;
+  overflow: hidden;
+}
+
+.dark #content-area,
+.dark main[role="main"],
+.dark main > article,
+.dark .content-area,
+.dark [data-content-area] {
+  background: #1a1614 !important;
+}
+
 /* ===== Group breadcrumb above page H1 — together.ai-style eyebrow ===== */
 /* Defensive selectors — Mintlify's exact class name varies by version */
 main header > div:first-child,
