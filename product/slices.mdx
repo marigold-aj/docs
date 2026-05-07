@@ -1,74 +1,98 @@
 ---
 title: "Slices"
-description: "AI-powered analysis templates that surface structured insights from your conversations."
-icon: "chart-pie"
+description: "Slices are AI analysis templates that surface structured, evidence-backed context tied to a specific business goal and role. OnePerfectSlice includes 27 pre-built slices across pipeline, deals, expansion, and product."
 ---
 
-## What are slices?
-
-Slices are pre-built AI analyses that answer specific business questions by examining your call transcripts and CRM data. Each slice gathers evidence, runs it through an LLM, and produces structured, scored output.
-
-OPS includes **27 pre-built slices** organized by business objective:
-
-| Objective | What it covers | Example slices |
-|-----------|---------------|----------------|
-| **Pipeline** | Grow your pipeline | Campaign ideas, content ideas, messaging hooks |
-| **Deals** | Win more deals | Enablement priorities, objection patterns |
-| **Expand** | Grow existing accounts | Expansion priorities, stakeholder mapping |
-| **Product** | Improve your product | Roadmap priorities, competitive intel |
+Where [summaries](/product/summaries) and [scorecards](/product/scorecards) focus on a single call, slices connect the dots across many conversations to surface trends, gaps, and opportunities.
 
 ## How to run a slice
 
 <Steps>
   <Step title="Browse the catalog">
-    View available slices in the app, filtered by your role or business objective.
+    View available slices, filtered by business objective or role.
   </Step>
-  <Step title="Configure filters">
-    Narrow the analysis scope with filters:
-    - **Date range** (up to 90 days lookback)
-    - **Call types** (discovery, demo, etc.)
-    - **Call owners** (specific reps)
-    - **Company domains**
-    - **CRM deals, companies, or stages**
+  <Step title="Set your filters">
+    Narrow the scope: date range, call types, reps, companies, CRM deals or stages.
   </Step>
   <Step title="Preview">
-    Use "Preview Count" to see how many calls match your filters before committing to a run.
+    Check how many calls match before committing — previews are free.
   </Step>
   <Step title="Run">
-    Start the analysis. Runs execute asynchronously — you can leave and come back.
+    Start the analysis. Runs execute in the background — you can leave and come back.
   </Step>
-  <Step title="Review results">
-    When complete, view structured output with a quality score (0.0 to 1.0) assessing completeness, specificity, grounding, and actionability.
-  </Step>
-  <Step title="Explore evidence">
-    Drill into the evidence: see which calls and CRM records supported each insight, with direct quotes and confidence scores.
+  <Step title="Review results and evidence">
+    View structured output with a quality score. Every insight is backed by direct quotes from your calls with source attribution and confidence scores.
   </Step>
 </Steps>
 
-## Run lifecycle
+## Slice catalog
 
-A slice run progresses through these phases:
+OnePerfectSlice includes 27 pre-built slices organized by business objective.
 
-```
-queued → gathering_evidence → analyzing_calls → synthesizing → completed
-```
+### Grow Pipeline
 
-If something goes wrong, the run moves to `failed` with an error message.
+Slices for demand gen, content marketing, and go-to-market teams.
 
-## Evidence
+| Slice | Description | Best for |
+|-------|-------------|----------|
+| **Personas Identified** | Identify buyer personas based on roles, responsibilities, and motivations from conversations | Product Marketing, Demand Gen |
+| **Segments Observed** | Identify company segments based on firmographics and buyer personas from conversations | Product Marketing, Demand Gen |
+| **Category Entry Points** | Identify the triggers and events that cause prospects to enter the market | Demand Gen, Marketing Ops |
+| **Positioning Angle** | Analyze positioning based on competitive landscape and unique selling points | Product Marketing |
+| **Messaging Hooks** | Generate punchy ad headlines and messaging hooks by combining customer pain points with hook type selection | Demand Gen, Content Marketing |
+| **Campaign Ideas** | Design campaign concepts by combining customer evidence with creative strategy selection | Demand Gen, Marketing Ops |
+| **Content Ideas** | Generate specific, shareable content pieces calibrated to buying stage and market position | Content Marketing, Demand Gen |
 
-Every insight is backed by traceable evidence. Evidence items include:
+### Win Deals
 
-- **Quote** — the exact text from a transcript or CRM record
-- **Source** — which call or CRM object the quote came from
-- **Confidence** — a score from 0.0 to 1.0
+Slices for sales enablement, sales ops, and frontline managers.
 
-Evidence is grouped by element (the specific thing being evaluated, like "budget confirmation" or "competitive mention").
+| Slice | Description | Best for |
+|-------|-------------|----------|
+| **Alternatives Evaluated** | What buyers compare you against — competitors, DIY, status quo, and do-nothing options | Sales Enablement, Product Marketing |
+| **Decision Criteria** | What factors buyers weigh when choosing — their priorities, evaluation methods, and your position | Sales Enablement, Sales Ops |
+| **Objection Patterns** | Common objections, how they surface, and proven responses | Sales Enablement |
+| **Pricing Dynamics** | Price sensitivity patterns, discount triggers, and value justification approaches that work | Sales Ops, Revenue Leadership |
+| **What's Working** | Successful rep behaviors and techniques to replicate across the team | Sales Enablement, Sales Managers |
+| **What's Breaking** | Rep behaviors that are failing or causing deals to stall | Sales Enablement, Sales Managers |
+| **Talk Tracks That Win** | Specific phrases and approaches that close deals | Sales Enablement |
+| **Enablement Priorities** | Prioritized enablement actions to improve win rates and sales effectiveness | Sales Enablement, Sales Ops |
+| **Asset & Content Gaps** | Missing sales assets or content that would improve close rates | Sales Enablement, Content Marketing |
+| **Skills to Develop** | Prioritized skill gaps to address through coaching or training | Sales Enablement, Sales Managers |
 
-## Using slices via the API
+### Expand Accounts
 
-You can run the full slice lifecycle programmatically. See the [Quickstart](/quickstart) for a walkthrough, or jump to the [API Reference](/api-reference) for full endpoint documentation.
+Slices for account management, customer success, and expansion teams.
 
-## Using slices via MCP
+| Slice | Description | Best for |
+|-------|-------------|----------|
+| **Expansion Signals** | Observable indicators that customers are ready for expansion | Account Management, Customer Success |
+| **Stakeholder Mapping** | Key stakeholders who can influence or approve expansion decisions | Account Management |
+| **Untapped Use Cases** | Use cases where customers could benefit but haven't adopted yet | Account Management, Product Marketing |
+| **Adoption Barriers** | Obstacles preventing deeper adoption or expansion | Customer Success, Product |
+| **Expansion Priorities** | Ranked expansion opportunities for account managers to pursue | Account Management, Sales Ops |
+| **Expansion Messaging** | Messages and value props that resonate for upsell conversations | Account Management, Product Marketing |
 
-If you use Claude Code or Claude Desktop, the [OPS MCP server](/mcp/overview) lets you run slices conversationally — just ask Claude to analyze your recent calls.
+### Improve Product
+
+Slices for product management, product marketing, and engineering leadership.
+
+| Slice | Description | Best for |
+|-------|-------------|----------|
+| **Feature Feedback** | Customer reactions to existing features — what resonates vs. needs attention | Product Management |
+| **Competitive Intelligence** | Competitor mentions, feature comparisons, and win/loss insights | Product Marketing, Product Management |
+| **Roadmap Priorities** | Prioritized feature requests and strategic improvements for the product roadmap | Product Management, Engineering |
+| **Quick Wins** | Small improvements with disproportionate customer impact requiring minimal engineering effort | Product Management, Engineering |
+
+## Access slices
+
+Slices are available programmatically through the [API](/api/introduction), by agents through the [MCP server](/mcp/overview), and through the slices page within the app.
+
+<Columns cols={2}>
+  <Card title="API" href="/api/endpoints#slices">
+    List slices, preview counts, start runs, and retrieve results and evidence.
+  </Card>
+  <Card title="MCP" href="/mcp/tools#run_slice">
+    Ask Claude to run a slice — it handles the full workflow in one tool call.
+  </Card>
+</Columns>

@@ -1,0 +1,26 @@
+# OnePerfectSlice Documentation
+
+> OnePerfectSlice analyzes sales conversations with AI to surface structured insights, evidence, and scorecards.
+
+## Docs
+- [Overview](https://oneperfectslice.mintlify.app/)
+- [Quickstart](https://oneperfectslice.mintlify.app/quickstart)
+- [Slices](https://oneperfectslice.mintlify.app/product/slices)
+- [Scorecards](https://oneperfectslice.mintlify.app/product/scorecards)
+- [Posts](https://oneperfectslice.mintlify.app/product/posts)
+- [HubSpot Integration](https://oneperfectslice.mintlify.app/integrations/hubspot)
+
+## API Reference
+- [Getting Started](https://oneperfectslice.mintlify.app/api/introduction)
+- [Authentication](https://oneperfectslice.mintlify.app/api/authentication)
+- [Endpoints](https://oneperfectslice.mintlify.app/api/endpoints)
+- [Rate Limiting](https://oneperfectslice.mintlify.app/api/rate-limiting)
+- [Pagination](https://oneperfectslice.mintlify.app/api/pagination)
+- [Errors](https://oneperfectslice.mintlify.app/api/errors)
+- [Data Models](https://oneperfectslice.mintlify.app/api/data-models)
+- [OpenAPI Spec](https://oneperfectslice.mintlify.app/api/openapi.yaml)
+
+## MCP Server
+- [Overview](https://oneperfectslice.mintlify.app/mcp/overview)
+- [Claude Code Setup](https://oneperfectslice.mintlify.app/mcp/claude-code)
+- [Claude Desktop Setup](https://oneperfectslice.mintlify.app/mcp/claude-desktop)

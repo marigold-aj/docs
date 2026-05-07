@@ -1,9 +1,9 @@
 ---
 title: "Errors"
-description: "Error codes, HTTP statuses, and how to handle failures."
+description: "Every error the OnePerfectSlice API can return — error envelope shape, HTTP status codes, error code reference, and how to handle each one."
 ---
 
-When a request fails, the API returns a JSON error envelope:
+When a request fails, the OnePerfectSlice API returns a JSON object with a machine-readable `code` and a human-readable `message`:
 
 ```json
 {
@@ -19,88 +19,81 @@ When a request fails, the API returns a JSON error envelope:
 }
 ```
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `code` | string | Machine-readable UPPER_SNAKE_CASE error code |
-| `message` | string | Human-readable description |
-| `details` | object \| null | Optional additional context |
+| Field | Type | What it contains |
+|-------|------|------------------|
+| `code` | string | Machine-readable identifier in UPPER_SNAKE_CASE |
+| `message` | string | Plain-English explanation of what went wrong |
+| `details` | object or null | Additional context when available (e.g., which field failed, valid alternatives) |
 
 ## HTTP status codes
 
-| Status | Meaning |
-|--------|---------|
-| **200** | Success |
-| **202** | Accepted — async operation started (slice runs) |
-| **400** | Bad request — invalid parameters or filters |
-| **401** | Unauthorized — invalid or missing API key |
-| **403** | Forbidden — usage limit exceeded |
-| **404** | Resource not found |
-| **409** | Conflict — idempotency key mismatch or run not completed |
-| **429** | Concurrency limit exceeded |
-| **503** | Temporary unavailability or timeout |
+| Status | What it means | What to do |
+|--------|---------------|------------|
+| **200** | Success | — |
+| **202** | Accepted — an async slice run has started | Poll `GET /slice-runs/{id}` for results |
+| **400** | Bad request — invalid parameters or filters | Fix the request body; check [filter endpoints](/api/filters) for valid values |
+| **401** | Unauthorized — missing or invalid API key | Check your key; see [Authentication](/api/authentication) |
+| **403** | Forbidden — usage limit exceeded | Wait for your billing cycle to reset or contact support |
+| **404** | Resource not found | Verify the ID and that your key has access to this team's data |
+| **409** | Conflict — idempotency mismatch or run not ready | Use a new idempotency key, or wait for the run to complete |
+| **429** | Concurrency limit exceeded | Wait for active runs to finish; see [Rate Limiting](/api/rate-limiting) |
+| **503** | Timeout or temporary unavailability | Retry with exponential backoff (1s → 2s → 4s) |
 
-## Authentication errors (401)
+## Error code reference
 
-| Code | Message |
-|------|---------|
-| `MISSING_TOKEN` | Authorization header with Bearer token is required |
-| `INVALID_TOKEN` | Token is invalid |
-| `TOKEN_REVOKED` | Token has been revoked |
-| `TOKEN_EXPIRED` | Token has expired |
+### Authentication (401)
 
-## Validation errors (400)
+| Code | When it happens |
+|------|-----------------|
+| `MISSING_TOKEN` | No `Authorization: Bearer` header in the request |
+| `INVALID_TOKEN` | The key doesn't match any active token |
+| `TOKEN_REVOKED` | An Org Admin revoked this key |
+| `TOKEN_EXPIRED` | The key has passed its expiration date |
 
-| Code | Message |
-|------|---------|
-| `INVALID_REQUEST` | Malformed JSON body |
-| `INVALID_FILTERS` | Filter validation failed |
-| `DATE_RANGE_TOO_WIDE` | Maximum lookback is 90 days from today |
-| `FILTER_ARRAY_TOO_LARGE` | Filter array exceeds maximum size |
-| `INVALID_IDEMPOTENCY_KEY` | Idempotency key must be between 1 and 255 characters |
+### Validation (400)
 
-## Resource errors (404)
+| Code | When it happens |
+|------|-----------------|
+| `INVALID_REQUEST` | The request body isn't valid JSON |
+| `INVALID_FILTERS` | One or more filter values are invalid |
+| `DATE_RANGE_TOO_WIDE` | Date range exceeds the 90-day lookback limit |
+| `FILTER_ARRAY_TOO_LARGE` | A filter array has more than 100 items |
+| `INVALID_IDEMPOTENCY_KEY` | Idempotency key is empty or longer than 255 characters |
 
-| Code | Message |
-|------|---------|
-| `SLICE_NOT_FOUND` | Slice not found |
-| `RUN_NOT_FOUND` | Run not found |
+### Not found (404)
+
+| Code | When it happens |
+|------|-----------------|
+| `SLICE_NOT_FOUND` | No slice with this key exists for your team |
+| `RUN_NOT_FOUND` | No run with this ID exists or it belongs to a different org |
 
 <Note>
-  Resources belonging to a different organization return 404, not 403, to prevent existence leakage.
+  Resources in a different organization always return 404 — never 403 — so you can't determine whether a resource exists outside your org.
 </Note>
 
-## Conflict errors (409)
+### Conflict (409)
 
-| Code | Message |
-|------|---------|
-| `IDEMPOTENCY_KEY_CONFLICT` | Idempotency key was already used with different arguments |
-| `RUN_NOT_COMPLETED` | Evidence is only available for completed runs |
+| Code | When it happens |
+|------|-----------------|
+| `IDEMPOTENCY_KEY_CONFLICT` | You reused an idempotency key with different arguments |
+| `RUN_NOT_COMPLETED` | You requested evidence for a run that hasn't finished yet |
 
-## Limit errors (403 / 429)
+### Limits (403 / 429)
 
-| Code | HTTP | Message |
-|------|------|---------|
-| `USAGE_LIMIT_EXCEEDED` | 403 | Monthly usage limit for AI insights runs has been exceeded |
-| `CONCURRENT_RUN_LIMIT` | 429 | Maximum of 5 concurrent slice runs per team |
+| Code | Status | When it happens |
+|------|--------|-----------------|
+| `USAGE_LIMIT_EXCEEDED` | 403 | Your team's monthly AI insights quota is exhausted |
+| `CONCURRENT_RUN_LIMIT` | 429 | Your team already has 5 active slice runs |
 
-## Timeout errors (503)
+### Timeouts (503)
 
-| Code | Message |
-|------|---------|
-| `PREVIEW_COUNT_TIMEOUT` | Preview count request timed out |
-| `RUN_LIST_TIMEOUT` | Run history request timed out |
-| `RUN_LOOKUP_TIMEOUT` | Run lookup request timed out |
-| `EVIDENCE_TIMEOUT` | Evidence request timed out |
-| `POST_SEARCH_TIMEOUT` | Post search request timed out |
-| `FILTER_LOOKUP_TIMEOUT` | Filter lookup request timed out |
-| `BILLING_UNAVAILABLE` | Usage gating is temporarily unavailable |
-| `IDEMPOTENCY_KEY_IN_PROGRESS` | A run for this Idempotency-Key is currently being created |
-
-## Handling errors
-
-- **401** — check your API key is valid and not revoked
-- **400** — fix request parameters; use filter discovery endpoints to find valid values
-- **404** — verify the resource ID and that your key has access
-- **409** — for idempotency conflicts, use a new key; for evidence, wait for the run to complete
-- **429** — wait for existing runs to finish before starting new ones
-- **503** — retry with exponential backoff
+| Code | When it happens |
+|------|-----------------|
+| `PREVIEW_COUNT_TIMEOUT` | Preview count query took too long — try narrowing your filters |
+| `RUN_LIST_TIMEOUT` | Run history query took too long |
+| `RUN_LOOKUP_TIMEOUT` | Run detail lookup took too long |
+| `EVIDENCE_TIMEOUT` | Evidence retrieval took too long |
+| `POST_SEARCH_TIMEOUT` | Post search took too long — try a shorter date range |
+| `FILTER_LOOKUP_TIMEOUT` | Filter lookup took too long |
+| `BILLING_UNAVAILABLE` | Usage gating service is temporarily down |
+| `IDEMPOTENCY_KEY_IN_PROGRESS` | Another request with this idempotency key is still being processed — retry in a few seconds |

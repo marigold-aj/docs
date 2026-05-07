@@ -1,0 +1,41 @@
+---
+title: "Overview"
+description: "OnePerfectSlice is structured around organizations and teams. Organizations own integrations and billing. Teams scope calls, summaries, scorecards, and slice runs — so each team only sees its own data."
+---
+
+## Organizations and teams
+
+- An **organization** is your company's account. It owns integrations (CRM, Notion), billing, and API keys.
+- A **team** is a group within your organization. Each team has its own calls, summaries, scorecards, and slice runs.
+
+Most data is **team-scoped** — a team only sees its own data. CRM data (deals, companies, contacts) is **org-scoped** because the CRM connection is shared.
+
+## How it's structured
+
+```
+Organization (your company)
+├── Team A (e.g., Enterprise Sales)
+│   ├── Members
+│   ├── Calls, summaries, scorecards
+│   └── Slice runs and evidence
+├── Team B (e.g., Mid-Market Sales)
+│   ├── Members
+│   ├── Calls, summaries, scorecards
+│   └── Slice runs and evidence
+└── Shared across org
+    ├── CRM data (HubSpot deals, companies, contacts)
+    ├── Integrations (Gong, Fireflies, Fathom, Notion)
+    ├── Billing
+    └── API keys (each scoped to one team)
+```
+
+## Users and membership
+
+- A user can belong to **multiple teams** within the same organization
+- A user can belong to **multiple organizations**
+- Each user has a **primary team** per organization — this is their default context when they log in
+- Users are added via invite (email) or can be added directly by an Org Admin
+
+## API keys and scoping
+
+API keys are created at the org level but scoped to a single team. A key for Team A can only access Team A's data. See [Authentication](/api/authentication) for details.

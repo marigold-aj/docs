@@ -1,18 +1,11 @@
 ---
 title: "HubSpot"
-description: "Connect HubSpot to enrich OPS with deal, company, and contact context."
+description: "Connect HubSpot to OnePerfectSlice to enrich your structured context with deal, company, and contact data from your CRM."
 ---
-
-## Supported CRMs
-
-| CRM | Status |
-|-----|--------|
-| **HubSpot** | Available |
-| Salesforce | Coming soon |
 
 ## What gets synced
 
-When you connect your CRM, OPS syncs three entity types:
+When you connect HubSpot, OnePerfectSlice syncs three entity types:
 
 | Entity | Data synced |
 |--------|------------|
@@ -20,16 +13,16 @@ When you connect your CRM, OPS syncs three entity types:
 | **Companies** | Name, domain, lifecycle stage, owner, custom fields |
 | **Contacts** | Email, name, lifecycle stage, owner, custom fields |
 
-OPS associates CRM records with calls by matching participant email addresses.
+OnePerfectSlice associates CRM records with calls by matching participant email addresses.
 
-## Connecting your CRM
+## Connect HubSpot
 
 <Steps>
   <Step title="Open Org Settings">
-    Navigate to **Organization Settings** → **Integrations**. You'll need Org Admin permissions.
+    Navigate to **Org Settings → Integrations**. You'll need Org Admin permissions.
   </Step>
-  <Step title="Connect HubSpot">
-    Click **Connect** on the HubSpot card. An OAuth popup will appear — authorize OPS to access your HubSpot account.
+  <Step title="Authorize">
+    Click **Connect** on the HubSpot card. An OAuth popup will appear — authorize OnePerfectSlice to access your HubSpot account.
   </Step>
   <Step title="Configure sync settings">
     After connecting, click **Settings** to configure:
@@ -44,17 +37,17 @@ OPS associates CRM records with calls by matching participant email addresses.
 - You can trigger a manual resync from the integration settings (rate-limited to once per hour)
 - OAuth tokens are refreshed automatically
 
-## How CRM data is used
+## How CRM data enriches your context
 
-Once connected, CRM data enhances OPS in several ways:
+Once connected, CRM data becomes part of the structured context OnePerfectSlice delivers:
 
-- **Filtering** — filter slices, posts, and runs by CRM deal, company, stage, or amount
-- **Enrichment** — CRM context is included when slices analyze calls, providing richer evidence
+- **Filtering** — filter summaries, scorecards, and slice runs by CRM deal, company, stage, or amount
+- **Enrichment** — CRM context is included when slices analyze calls, producing richer and more grounded evidence
 - **Custom fields** — map CRM fields to create custom filters (e.g., filter by industry, deal size tier, or any custom property)
 
-## Filter typeaheads
+## Filter endpoints
 
-The API provides typeahead endpoints for building filter UIs with CRM data:
+The API provides endpoints for searching CRM data programmatically:
 
 - `/filters/crm-deals` — search deals by name
 - `/filters/crm-companies` — search companies by name
@@ -62,9 +55,9 @@ The API provides typeahead endpoints for building filter UIs with CRM data:
 - `/filters/crm-fields` — list configured custom fields and their valid values
 
 <Note>
-  CRM reference data (deals, companies, stages, fields) is **org-scoped** because the CRM connection is shared across the organization. Calls and posts remain **team-scoped**.
+  CRM data is **org-scoped** because the CRM connection is shared across the organization. Summaries, scorecards, and calls remain **team-scoped**.
 </Note>
 
 ## Disconnecting
 
-You can disconnect your CRM at any time from Org Settings. Disconnecting clears the OAuth tokens but retains previously synced CRM data.
+You can disconnect HubSpot at any time from Org Settings. Disconnecting clears the OAuth tokens but retains previously synced CRM data.

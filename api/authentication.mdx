@@ -1,67 +1,45 @@
 ---
 title: "Authentication"
-description: "API key authentication for the OPS Public API."
+description: "Authenticate with the OnePerfectSlice API using team-scoped Bearer token API keys. Learn how auth works, manage keys, handle errors, and follow security best practices."
 ---
 
-All API requests must include a team-scoped API key as a Bearer token in the `Authorization` header.
+Every request to the OnePerfectSlice API requires a Bearer token in the `Authorization` header.
 
 ```bash
-curl https://app.oneperfectslice.ai/api/public/v1/slices \
-  -H "Authorization: Bearer sk_your_api_key"
+Authorization: Bearer sk_your_api_key
 ```
 
-## API keys
+API keys start with `sk_` and are created in Org Settings. Don't have one yet? Follow the [Getting Started](/api/introduction) guide.
 
-API keys are prefixed with `sk_` and scoped to a single team. A key for Team A cannot access Team B's data.
+## How authentication works
 
-### Creating a key
+Each API key is scoped to a **single team**. When you make a request, OnePerfectSlice verifies the key and returns only data visible to that team.
 
-<Steps>
-  <Step title="Open Org Settings">
-    Navigate to [app.oneperfectslice.ai/settings](https://app.oneperfectslice.ai/settings) and open the **API Keys** section. You'll need Org Admin permissions.
-  </Step>
-  <Step title="Create a key">
-    Click **Create API Key**. Provide a name (e.g., "Production" or "MCP Server") and select the team it should be scoped to.
-  </Step>
-  <Step title="Copy the key">
-    Your key will be displayed **once**. Copy it immediately and store it securely (e.g., a password manager or environment variable).
-  </Step>
-</Steps>
+- **One key, one team** — a key created for Team A cannot read Team B's data
+- **Org-level isolation** — requests for resources in a different organization return `404` (not `403`) to prevent leaking whether a resource exists
 
-<Warning>
-  The raw key value is never stored by OPS — only an Argon2id hash. If you lose it, you'll need to create a new one.
-</Warning>
+## Managing your API keys
 
-### Managing keys
+Org Admins can manage keys from **Org Settings → API Keys**:
 
-From the API Keys page you can see all keys for your organization:
+| Action | What it does |
+|--------|-------------|
+| **Create** | Generate a new key for a specific team. The key is shown once — copy it immediately. |
+| **View** | See all keys across your org, including name, team, and last-used timestamp |
+| **Revoke** | Permanently disable a key. Takes effect immediately — any in-flight requests will fail. |
 
-- **Name** — the label you assigned
-- **Team** — which team the key is scoped to
-- **Last used** — when the key was last used for an API call
-- **Revoke** — permanently disable the key
+<Note>
+  OnePerfectSlice never stores your raw key. If you lose a key, create a new one and revoke the old one.
+</Note>
 
 ## Authentication errors
 
-| Code | HTTP | Meaning |
-|------|------|---------|
-| `MISSING_TOKEN` | 401 | `Authorization` header with Bearer token is required |
-| `INVALID_TOKEN` | 401 | Token is not recognized |
-| `TOKEN_REVOKED` | 401 | Token has been revoked in Org Settings |
-| `TOKEN_EXPIRED` | 401 | Token has passed its expiration date |
+If authentication fails, the API returns a `401` with an error code like `MISSING_TOKEN`, `INVALID_TOKEN`, `TOKEN_REVOKED`, or `TOKEN_EXPIRED`. See the [Errors page](/api/errors#authentication-401) for the full reference.
 
-## Security details
+## Security best practices
 
-- Keys are stored using **Argon2id** hashing
-- Token verification uses constant-time comparison to prevent timing attacks
-- Keys are team-scoped — cross-team access is not possible
-- Resources belonging to a different org return `404`, not `403` (no existence leakage)
-- Revoked keys are immediately invalidated
-
-## Best practices
-
-- Create separate keys for different use cases (e.g., one for your integration, one for MCP)
-- Rotate keys periodically
-- Never commit keys to source control or expose them in client-side code
-- Use environment variables in your applications
-- Revoke keys immediately if they may have been compromised
+- **Use environment variables** — store keys in `.env` or your secrets manager, never in source code
+- **Create separate keys** for each use case (production, staging, MCP server, Zapier)
+- **Rotate keys regularly** — create a new key, update your integrations, then revoke the old one
+- **Revoke compromised keys immediately** — revocation takes effect on the next request
+- **Never expose keys** in client-side code, git repos, logs, or error messages

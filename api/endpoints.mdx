@@ -1,0 +1,78 @@
+---
+title: "Endpoints"
+description: "The OnePerfectSlice API has 20 endpoints across five groups — slices, runs, posts, filters, and reference data. Here's how they're organized, the typical integration workflow, and what each endpoint does."
+---
+
+Most integrations follow the same pattern: discover what analyses are available, run one, and retrieve the results. The 20 endpoints are organized into five groups that map to this workflow.
+
+## Typical workflow
+
+```
+List slices          → see what analyses your team has access to
+Preview count        → check how many calls match your filters (free, no AI cost)
+Run a slice          → kick off async AI analysis (returns 202 immediately)
+Poll the run         → check status until completed
+Get results          → pull structured output and supporting evidence
+```
+
+This is the most common path, but not the only one. You can search posts directly if you just need summaries, browse past runs without starting new ones, or use the filter endpoints to build a selection UI.
+
+## Slices
+
+Slices are AI analysis templates. Each one targets a specific business question — like "which deals show buying intent?" or "where are reps missing discovery questions?" — and evaluates your calls against a set of scoring elements.
+
+| Method | Path | What it does |
+|--------|------|-------------|
+| GET | `/slices` | List every slice your team has access to |
+| GET | `/slices/{key}` | Get a slice's full definition, including its output schema |
+| POST | `/slices/{key}/preview-count` | Count how many calls match your filters — without spending an AI run |
+| POST | `/slices/{key}/run` | Start an async analysis. Returns `202` with a `runId` for polling |
+
+## Slice Runs
+
+Once you start a run, these endpoints let you track progress and retrieve results. Runs are asynchronous — they move through phases (`queued` → `gathering_evidence` → `analyzing_calls` → `synthesizing` → `completed`) and can take seconds to minutes depending on how many calls match.
+
+| Method | Path | What it does |
+|--------|------|-------------|
+| GET | `/slice-runs` | Browse run history, filterable by slice key and status |
+| GET | `/slice-runs/{id}` | Get a run's current status, progress, and results (when completed) |
+| GET | `/slice-runs/{id}/evidence` | Get evidence grouped by element — only available for completed runs |
+| POST | `/evidence/search` | Search evidence across multiple completed runs by element, keyword, or date |
+
+## Posts
+
+Posts are the AI-generated outputs from processed calls — either a **summary** (key topics, decisions, next steps) or a **scorecard** (element-by-element rep evaluation). These endpoints let you search, filter, and retrieve them.
+
+| Method | Path | What it does |
+|--------|------|-------------|
+| POST | `/posts/search` | Search posts by date, call type, rep, CRM deal, company, and more |
+| GET | `/posts/{id}` | Get a single post with the full structured payload |
+| GET | `/posts/filters` | Discover which filter keys and values are available for your team |
+
+## Filters
+
+Before running a slice or searching posts, you may need to know what values are valid for your filters. These typeahead endpoints let you search for call owners, companies, and CRM entities.
+
+| Method | Path | What it does | Scope |
+|--------|------|-------------|-------|
+| GET | `/filters/call-owners` | Search call owners by name | Team |
+| GET | `/filters/company-domains` | Search company domains | Team |
+| GET | `/filters/crm-deals` | Search CRM deals by name | Org |
+| GET | `/filters/crm-companies` | Search CRM companies by name | Org |
+| GET | `/filters/crm-deal-stages` | List CRM deal stages | Org |
+| GET | `/filters/crm-fields` | List configured CRM custom fields and their valid values | Org |
+
+<Note>
+  Call owners and company domains are **team-scoped**. CRM data (deals, companies, stages, fields) is **org-scoped** because CRM connections are shared across the organization.
+</Note>
+
+## Reference Data
+
+These endpoints return metadata about your team's configuration — useful for understanding what call types and analysis elements exist before building filters or interpreting results.
+
+| Method | Path | What it does |
+|--------|------|-------------|
+| GET | `/call-types` | List active call types (e.g., "Discovery Call", "Demo") with call counts |
+| GET | `/elements` | List active analysis elements (e.g., "Budget Confirmation", "Competitive Mention") |
+
+For full details on how these entities relate to each other, see [Data Models](/api/data-models).

@@ -1,0 +1,43 @@
+---
+title: "Summaries"
+description: "OnePerfectSlice automatically generates a structured summary for every call — tailored by call type so discovery calls, demos, and QBRs each surface the context that matters most."
+---
+
+## How summaries work
+
+1. A call is ingested from your [connected recording platform](/integrations/index) or uploaded directly
+2. The call is [automatically classified](/product/call-types) into a type (discovery, demo, QBR, etc.)
+3. The summary template matched to that call type is applied
+4. AI processes the transcript alongside any available CRM context
+5. A structured summary is generated and available to your team, agents, and workflows
+
+This happens automatically for every call — no manual trigger required.
+
+## Structured by call type
+
+This is the key: **every call type has its own summary template.** A discovery call summary surfaces different context than a demo summary or a QBR summary.
+
+Because every call of the same type follows the same structure, you can compare consistently across reps, accounts, and time periods. That's what makes the context useful at scale — for your team, your workflows, and your AI agents.
+
+For example:
+- **Discovery Call summaries** surface pain points, decision criteria, budget signals, and competitive landscape
+- **Demo Call summaries** capture feature reactions, objections addressed, and next steps
+- **Renewal Call summaries** focus on renewal signals, churn risks, and value anchoring
+
+See [Call Classification](/product/call-types) for the full list of call types and what each template covers.
+
+## Access summaries anywhere
+
+Summaries are available in the app, through the [API](/api/introduction), and to AI agents via the [MCP server](/mcp/overview).
+
+<Columns cols={3}>
+  <Card title="In the app" href="https://app.oneperfectslice.ai">
+    Browse, filter, and search summaries from the posts feed.
+  </Card>
+  <Card title="Via the API" href="/api/endpoints#posts">
+    Search and retrieve summaries programmatically. Pipe them into Zapier, n8n, or your own tools.
+  </Card>
+  <Card title="Via MCP" href="/mcp/tools#search_posts">
+    Ask Claude to find summaries — "Show me summaries from Jane's discovery calls this week."
+  </Card>
+</Columns>

@@ -1,0 +1,199 @@
+---
+title: "Tools"
+description: "Complete reference for all 9 tools available in the OnePerfectSlice MCP server — parameters, return values, and example prompts for each."
+---
+
+The OnePerfectSlice MCP server exposes 9 tools. Each tool maps to one or more API endpoints but is designed for conversational use — flat parameters, composite operations, and error messages that guide the agent to the right next step.
+
+## list_slices
+
+Discover what analyses are available, or get full details for a specific slice.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `slice_key` | string | No | If provided, returns full detail with output schema. Otherwise returns the full catalog. |
+
+**Example prompts:**
+- "What slices do I have access to?"
+- "Show me the details for the high_intent_deals slice"
+
+---
+
+## preview_slice_count
+
+Check how many calls match your filters — without starting a run or using AI credits.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `slice_key` | string | Yes | Which slice to preview |
+| `date_from` | string | Yes | Start date (ISO format, e.g., `2026-03-26`) |
+| `date_to` | string | Yes | End date |
+| `call_types` | string[] | No | Filter by call type keys |
+| `call_owner_emails` | string[] | No | Filter by rep emails |
+| `company_domains` | string[] | No | Filter by company domains |
+| `crm_deal_stages` | string[] | No | Filter by CRM deal stages |
+| `crm_deal_ids` | integer[] | No | Filter by CRM deal IDs |
+| `crm_company_ids` | integer[] | No | Filter by CRM company IDs |
+| `crm_amount_min` | number | No | Minimum deal amount |
+| `crm_amount_max` | number | No | Maximum deal amount |
+| `crm_field_filters` | string[] | No | Custom CRM filters (`"field=value"` syntax) |
+
+**Example prompts:**
+- "How many discovery calls happened last month?"
+- "Preview how many calls match the high_intent_deals slice for Q1"
+
+---
+
+## run_slice
+
+Run an AI analysis and get results. Waits up to 30 seconds for completion — if the run takes longer, returns a run ID for polling with `get_run`.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `slice_key` | string | Yes | Which slice to run |
+| `date_from` | string | Yes | Start datetime (ISO format) |
+| `date_to` | string | Yes | End datetime |
+| `call_types` | string[] | No | Filter by call type keys |
+| `call_owner_emails` | string[] | No | Filter by rep emails |
+| `company_domains` | string[] | No | Filter by company domains |
+| `crm_deal_stages` | string[] | No | Filter by CRM deal stages |
+| `crm_deal_ids` | integer[] | No | Filter by CRM deal IDs |
+| `crm_company_ids` | integer[] | No | Filter by CRM company IDs |
+| `crm_amount_min` | number | No | Minimum deal amount |
+| `crm_amount_max` | number | No | Maximum deal amount |
+| `crm_field_filters` | string[] | No | Custom CRM filters (`"field=value"` syntax) |
+
+**What happens behind the scenes:**
+1. Starts an async run via the API
+2. Polls for up to 30 seconds
+3. If completed, automatically fetches evidence and returns everything together
+4. If still running, returns the run ID with a progress message
+
+**Example prompts:**
+- "Run the high intent deals analysis on last month's calls"
+- "Analyze discovery calls from the past 2 weeks for the enterprise team"
+
+---
+
+## get_run
+
+Retrieve results from a past run, or check progress on a running one. Automatically fetches evidence when the run is completed.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `run_id` | integer | Yes | The run ID (returned by `run_slice` or `list_runs`) |
+
+**Example prompts:**
+- "Get the results for run 12345"
+- "Check if my last analysis is done yet"
+
+---
+
+## list_runs
+
+Browse your team's run history with optional filtering.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `slice_key` | string | No | Filter by slice |
+| `status` | string | No | `pending`, `running`, `completed`, or `failed` |
+| `limit` | integer | No | Number of results (default 20, max 100) |
+
+**Example prompts:**
+- "Show me recent completed runs"
+- "What runs are currently active?"
+- "List the last 5 high_intent_deals runs"
+
+---
+
+## search_posts
+
+Find AI-generated summaries and scorecards matching your criteria.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `template_type` | string | No | `summary` or `scorecard` |
+| `call_type_ids` | integer[] | No | Filter by call type IDs |
+| `date_from` | string | No | Start datetime |
+| `date_to` | string | No | End datetime |
+| `call_owner_emails` | string[] | No | Filter by rep emails |
+| `company_domains` | string[] | No | Filter by company domains |
+| `crm_deal_stages` | string[] | No | Filter by CRM deal stages |
+| `crm_deal_ids` | integer[] | No | Filter by CRM deal IDs |
+| `crm_company_ids` | integer[] | No | Filter by CRM company IDs |
+| `crm_amount_min` | number | No | Minimum deal amount |
+| `crm_amount_max` | number | No | Maximum deal amount |
+| `crm_field_filters` | string[] | No | Custom CRM filters |
+| `limit` | integer | No | Results per page (default 20, max 100) |
+| `offset` | integer | No | Pagination offset |
+
+**Example prompts:**
+- "Find scorecards for Jane's calls last week"
+- "Search for summaries mentioning Acme Corp"
+- "Get the most recent 10 discovery call summaries"
+
+---
+
+## get_post
+
+Retrieve a single post with full structured content.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `post_id` | integer | Yes | The post ID |
+
+**Example prompts:**
+- "Show me post 456"
+- "Get the full scorecard for that call"
+
+---
+
+## search_evidence
+
+Search for evidence quotes across all completed runs. Useful for finding patterns or specific mentions across multiple analyses.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `element_keys` | string[] | Yes | Which elements to search (e.g., `["intent_signal"]`) |
+| `query` | string | No | Free-text search across quotes |
+| `call_types` | string[] | No | Filter by call type keys |
+| `call_owner_emails` | string[] | No | Filter by rep emails |
+| `date_from` | string | No | Start date |
+| `date_to` | string | No | End date |
+| `limit` | integer | No | Max results (1–100) |
+
+**Example prompts:**
+- "Find evidence of budget objections in discovery calls"
+- "Search for competitive mentions from the last quarter"
+- "Show me intent signals from Acme Corp calls"
+
+---
+
+## get_filter_options
+
+Discover valid values for any filter type. Call this before filtering when you're not sure what values are available.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `filter_type` | string | Yes | See table below |
+| `query` | string | No | Prefix search (for typeahead-capable filters) |
+
+**Available filter types:**
+
+| Value | What it returns | Supports `query` |
+|-------|----------------|------------------|
+| `call_types` | Call type keys and labels | No |
+| `elements` | Analysis element keys and labels | No |
+| `call_owners` | Rep names and emails | Yes |
+| `company_domains` | Company domains | Yes |
+| `crm_deals` | CRM deal names | Yes |
+| `crm_companies` | CRM company names | Yes |
+| `crm_deal_stages` | Pipeline stages | No |
+| `crm_fields` | Custom CRM field definitions | No |
+| `post_filters` | Available post filter keys | No |
+
+**Example prompts:**
+- "What call types are available?"
+- "Search for call owners named Jane"
+- "What CRM deal stages exist?"
+- "Show me available CRM custom fields"

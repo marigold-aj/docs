@@ -1,15 +1,16 @@
 ---
-title: "Claude Code"
-description: "Install the OnePerfectSlice MCP server for Claude Code — step-by-step setup, verification, troubleshooting, and updating."
+title: "Codex"
+description: "Install the OnePerfectSlice MCP server for OpenAI Codex — step-by-step setup, verification, and troubleshooting."
 ---
 
 ## Install
 
 <Steps>
   <Step title="Check prerequisites">
-    Verify Node.js v20+ is installed:
+    Verify Node.js v20+ and Codex are installed:
     ```bash
-    node --version  # must be v20.0.0 or higher
+    node --version   # must be v20.0.0 or higher
+    codex --version  # any recent version
     ```
   </Step>
   <Step title="Download the MCP server">
@@ -25,15 +26,15 @@ description: "Install the OnePerfectSlice MCP server for Claude Code — step-by
   </Step>
   <Step title="Register the MCP server">
     ```bash
-    claude mcp add ops --scope user --transport stdio \
+    codex mcp add ops \
       --env OPS_API_KEY=sk_your_api_key \
       -- node $HOME/ops-mcp/src/index.js
     ```
   </Step>
   <Step title="Verify">
-    Restart Claude Code, then run:
+    Restart Codex or start a new session, then run:
     ```bash
-    claude mcp list
+    codex mcp list
     ```
     You should see `ops` in the output.
   </Step>
@@ -41,7 +42,7 @@ description: "Install the OnePerfectSlice MCP server for Claude Code — step-by
 
 ## Test it
 
-In Claude Code, try:
+In Codex, try:
 
 ```
 Use ops to list available slices
@@ -53,10 +54,10 @@ You should see a tool call to `list_slices` and get back a list of your team's s
 
 | Problem | Solution |
 |---------|----------|
-| `ops` not showing in `mcp list` | Re-run the `claude mcp add` command and restart Claude Code |
+| `ops` not showing in `mcp list` | Re-run the `codex mcp add` command and restart Codex |
 | `INVALID_OR_EXPIRED_TOKEN` in logs | Check your API key is correct. View logs at `~/.ops-mcp/logs/ops-mcp.log` |
-| `node: command not found` | Use the full path to node in the `claude mcp add` command (e.g., `/usr/local/bin/node`) |
-| Tool calls fail silently | Force-quit Claude Code completely and relaunch |
+| `node: command not found` | Use the full path to node (e.g., `/usr/local/bin/node`) |
+| Tool calls fail silently | Fully quit Codex and start a new session |
 
 ## Updating
 
@@ -69,4 +70,4 @@ tar xzf /tmp/ops-mcp.tar.gz -C ~
 cd ~/ops-mcp && npm install
 ```
 
-Your Claude Code configuration is preserved — just restart Claude Code after updating.
+Your Codex configuration is preserved — just restart Codex after updating.

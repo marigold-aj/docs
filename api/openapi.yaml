@@ -1,14 +1,14 @@
 openapi: "3.1.0"
 info:
-  title: OPS Public API
+  title: OnePerfectSlice API
   version: "1.0.0"
   description: |
-    Programmatic access to One Perfect Slice. Authenticate with a team-scoped
-    API key (Bearer sk_...) obtained from OrgSettings.
+    Programmatic access to OnePerfectSlice. Authenticate with a team-scoped
+    API key (Bearer sk_...) obtained from Org Settings → API Keys.
 
 servers:
-  - url: /
-    description: OPS server root (paths include the full /api/public/v1 prefix)
+  - url: https://app.oneperfectslice.ai
+    description: Production
 
 security:
   - bearerAuth: []
@@ -17,7 +17,14 @@ paths:
   /api/public/v1/slices:
     get:
       operationId: listSlices
-      summary: List all slices available to the token's team
+      summary: List slices
+      description: |
+        Returns all AI analysis templates available to your team, including each slice's key, title, business objective, and the elements it evaluates.
+
+        **Related:** [Get slice details](/api-reference/slices/get-slice-details) · [Preview matched call count](/api-reference/slices/preview-matched-call-count)
+      x-mint:
+        content: |
+          <Tip>This is usually your first API call. Browse the available slices, then use [Get slice details](/api-reference/slices/get-slice-details) to see the full output schema before running one.</Tip>
       tags: [Slices]
       security:
         - bearerAuth: []
@@ -44,7 +51,11 @@ paths:
   /api/public/v1/slices/{key}:
     get:
       operationId: getSlice
-      summary: Get full slice definition including outputSchema
+      summary: Get slice details
+      description: Returns the complete definition for a single slice, including its output schema, preferred model, and evidence grouping strategy. Use this to understand what a slice produces before running it.
+      x-mint:
+        content: |
+          <Tip>The `outputSchema` field tells you the exact shape of the structured result you'll get when a run completes. Use it to plan how your integration handles the output.</Tip>
       tags: [Slices]
       security:
         - bearerAuth: []
@@ -92,7 +103,11 @@ paths:
   /api/public/v1/slices/{key}/preview-count:
     post:
       operationId: previewCount
-      summary: Return matched call count without triggering LLM analysis
+      summary: Preview matched call count
+      description: Returns how many calls match your filters without starting an analysis run. Use this to check scope and cost before committing to a run. Dates are required; all other filters are optional.
+      x-mint:
+        content: |
+          <Tip>Always preview before running. This call is free — it only counts matching calls without using any AI credits.</Tip>
       tags: [Slices]
       security:
         - bearerAuth: []
@@ -169,7 +184,16 @@ paths:
   /api/public/v1/slices/{key}/run:
     post:
       operationId: runSlice
-      summary: Start async slice execution
+      summary: Run a slice
+      description: |
+        Starts an asynchronous AI analysis run for the given slice. Returns `202 Accepted` with a `runId` you can use to poll for results via GET /slice-runs/{id}.
+
+        Pass an `Idempotency-Key` header to safely retry — same key with same arguments returns the original run, same key with different arguments returns `409`.
+
+        **Related:** [Get run details](/api-reference/slice-runs/get-run-details) · [Get run evidence](/api-reference/slice-runs/get-run-evidence) · [List runs](/api-reference/slice-runs/list-runs)
+      x-mint:
+        content: |
+          <Note>Runs are asynchronous. After starting a run, poll [Get run details](/api-reference/slice-runs/get-run-details) using the returned `runId`. Check `suggestedPollAfterSeconds` for the recommended wait time between polls.</Note>
       tags: [Slices]
       security:
         - bearerAuth: []
@@ -274,7 +298,11 @@ paths:
   /api/public/v1/slice-runs:
     get:
       operationId: listSliceRuns
-      summary: List paginated run history, filterable by sliceKey and status
+      summary: List runs
+      description: Returns a paginated list of slice runs for your team, ordered by most recent first. Filter by slice key or status (pending, running, completed, failed).
+      x-mint:
+        content: |
+          <Tip>Use `status=running` to check how many runs are active before starting a new one — there's a limit of 5 concurrent runs per team.</Tip>
       tags: [Slice Runs]
       security:
         - bearerAuth: []
@@ -350,7 +378,16 @@ paths:
   /api/public/v1/slice-runs/{id}:
     get:
       operationId: getSliceRun
-      summary: Get run status, progress, and result when completed
+      summary: Get run details
+      description: |
+        Returns the current status, progress, and results for a slice run. Use this to poll an in-progress run — check `suggestedPollAfterSeconds` for the recommended wait time.
+
+        When `status` is `completed`, the `result` field contains structured output conforming to the slice's output schema.
+
+        **Related:** [Get run evidence](/api-reference/slice-runs/get-run-evidence) · [Search evidence](/api-reference/slice-runs/search-evidence)
+      x-mint:
+        content: |
+          <Tip>Watch the `phase` field for granular progress: `queued` → `gathering_evidence` → `analyzing_calls` → `synthesizing` → `completed`. Show this to users if building a progress UI.</Tip>
       tags: [Slice Runs]
       security:
         - bearerAuth: []
@@ -399,7 +436,11 @@ paths:
   /api/public/v1/slice-runs/{id}/evidence:
     get:
       operationId: getSliceRunEvidence
-      summary: Get evidence items grouped by element, capped at 20 per element
+      summary: Get run evidence
+      description: Returns evidence items for a completed run, grouped by element. Each item includes a direct quote, source reference, and confidence score. Capped at 20 items per element — use the `count` field to see the true total.
+      x-mint:
+        content: |
+          <Warning>This endpoint only works for completed runs. If the run is still in progress, you'll get a `409 RUN_NOT_COMPLETED` error. Poll [Get run details](/api-reference/slice-runs/get-run-details) first to confirm the run has finished.</Warning>
       tags: [Slice Runs]
       security:
         - bearerAuth: []
@@ -458,7 +499,11 @@ paths:
   /api/public/v1/evidence/search:
     post:
       operationId: searchEvidence
-      summary: Search normalized evidence across completed runs
+      summary: Search evidence
+      description: Search for evidence across multiple completed runs. Filter by element keys, text query, call types, call owners, and date range. Useful for finding specific quotes or patterns across analyses.
+      x-mint:
+        content: |
+          <Tip>Unlike [Get run evidence](/api-reference/slice-runs/get-run-evidence) which returns evidence for a single run, this endpoint searches across all your completed runs — useful for trend analysis or finding recurring themes.</Tip>
       tags: [Slice Runs]
       security:
         - bearerAuth: []
@@ -468,6 +513,10 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/PublicEvidenceSearchRequest"
+            example:
+              elementKeys: ["intent_signal"]
+              query: "budget"
+              limit: 10
       responses:
         "200":
           description: Matching evidence items
@@ -484,6 +533,18 @@ paths:
                         type: array
                         items:
                           type: object
+              example:
+                data:
+                  matches:
+                    - quote: "We're aiming to have a vendor selected by end of Q2."
+                      source:
+                        type: transcript
+                        id: "file:98123"
+                        label: "Acme Corp — Discovery Call"
+                        date: "2026-04-12"
+                      confidence: 0.91
+                      elementKey: intent_signal
+                      runId: 12345
         "400":
           description: Invalid request body or filters
           content:
@@ -502,8 +563,16 @@ paths:
   /api/public/v1/posts/search:
     post:
       operationId: searchPosts
-      summary: Search posts for the token's team using structured filters
-      description: CRM filter values are selected from org-scoped CRM reference data, but returned posts remain team-scoped.
+      summary: Search posts
+      description: |
+        Search AI-generated summaries and scorecards for your team. Filter by date, call type, rep, company, CRM deal, and more. Send an empty body `{}` to return recent posts.
+
+        Set `detail: true` to get full post payloads, or leave it `false` (default) for compact summaries with snippets.
+
+        **Related:** [Get a post](/api-reference/posts/get-a-post) · [List post filters](/api-reference/posts/list-post-filters)
+      x-mint:
+        content: |
+          <Tip>Start with `detail: false` (the default) for faster, smaller responses. Only set `detail: true` when you need the full structured payload for a specific post.</Tip>
       tags: [Posts]
       security:
         - bearerAuth: []
@@ -513,6 +582,9 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/PublicPostSearchRequest"
+            example:
+              templateType: ["summary"]
+              limit: 5
       responses:
         "200":
           description: Paginated post search results
@@ -581,7 +653,11 @@ paths:
   /api/public/v1/posts/{id}:
     get:
       operationId: getPost
-      summary: Retrieve a single post by id
+      summary: Get a post
+      description: Returns the full detail for a single post, including the structured result payload, call metadata, owner, and team information.
+      x-mint:
+        content: |
+          <Tip>Use `fileId` (not `postId`) to link summaries and scorecards for the same call — a single call can produce both a summary post and a scorecard post.</Tip>
       tags: [Posts]
       security:
         - bearerAuth: []
@@ -615,7 +691,11 @@ paths:
   /api/public/v1/posts/filters:
     get:
       operationId: listPostFilters
-      summary: List available post filters for the token's team
+      summary: List post filters
+      description: Returns the available filter keys and their valid values for post search. Use this to discover what filters your team can apply before calling POST /posts/search.
+      x-mint:
+        content: |
+          <Tip>Call this first when building a filter UI. The response tells you exactly which filter keys exist and what values are valid for each.</Tip>
       tags: [Posts]
       security:
         - bearerAuth: []
@@ -649,64 +729,17 @@ paths:
                   code: FILTER_LOOKUP_TIMEOUT
                   message: Filter discovery request timed out
 
-  /api/public/v1/call-types:
-    get:
-      operationId: listCallTypes
-      summary: List active call types for the token's team
-      tags: [Reference Data]
-      security:
-        - bearerAuth: []
-      responses:
-        "200":
-          description: Team-scoped call types
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [data]
-                properties:
-                  data:
-                    type: object
-                    required: [callTypes]
-                    properties:
-                      callTypes:
-                        type: array
-                        items:
-                          $ref: "#/components/schemas/PublicCallTypeResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-
-  /api/public/v1/elements:
-    get:
-      operationId: listElements
-      summary: List active elements for the token's team
-      tags: [Reference Data]
-      security:
-        - bearerAuth: []
-      responses:
-        "200":
-          description: Team-scoped elements
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [data]
-                properties:
-                  data:
-                    type: object
-                    required: [elements]
-                    properties:
-                      elements:
-                        type: array
-                        items:
-                          $ref: "#/components/schemas/PublicElementResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-
   /api/public/v1/filters/call-owners:
     get:
       operationId: getCallOwners
-      summary: Search call owners for the token's team
+      summary: Search call owners
+      description: |
+        Search for call owners on your team by name. Returns matching owners with their email and call count. Use the results to populate `callOwnerEmails` filters.
+
+        **Related:** [Search posts](/api-reference/posts/search-posts) · [Run a slice](/api-reference/slices/run-a-slice)
+      x-mint:
+        content: |
+          <Tip>Pass `q` for typeahead search, or omit it to get all call owners. Use the returned `email` values in `callOwnerEmails` filters on slice runs and post searches.</Tip>
       tags: [Filters]
       security:
         - bearerAuth: []
@@ -750,7 +783,8 @@ paths:
   /api/public/v1/filters/company-domains:
     get:
       operationId: getCompanyDomains
-      summary: Search company domains for the token's team
+      summary: Search company domains
+      description: Search for company domains associated with calls on your team. Returns matching domains with call counts. Use the results to populate `companyDomains` filters.
       tags: [Filters]
       security:
         - bearerAuth: []
@@ -794,8 +828,8 @@ paths:
   /api/public/v1/filters/crm-deals:
     get:
       operationId: getCrmDeals
-      summary: Search CRM deals for filter typeahead
-      description: CRM deal reference data is org-scoped because the CRM connection is organization-owned.
+      summary: Search CRM deals
+      description: Search CRM deals by name across your organization. Returns matching deals with stage, amount, and call count. CRM data is shared across all teams in your org.
       tags: [Filters]
       security:
         - bearerAuth: []
@@ -839,8 +873,8 @@ paths:
   /api/public/v1/filters/crm-companies:
     get:
       operationId: getCrmCompanies
-      summary: Search CRM companies for filter typeahead
-      description: CRM company reference data is org-scoped because the CRM connection is organization-owned.
+      summary: Search CRM companies
+      description: Search CRM companies by name across your organization. Returns matching companies with call counts. CRM data is shared across all teams in your org.
       tags: [Filters]
       security:
         - bearerAuth: []
@@ -884,8 +918,8 @@ paths:
   /api/public/v1/filters/crm-deal-stages:
     get:
       operationId: getCrmDealStages
-      summary: List CRM deal stages for filter dropdown
-      description: CRM deal stage reference data is org-scoped because the CRM connection is organization-owned.
+      summary: List CRM deal stages
+      description: Returns all CRM deal stages for your organization with call counts. Use the results to populate `crmDealStages` filters in slice runs and post searches.
       tags: [Filters]
       security:
         - bearerAuth: []
@@ -912,8 +946,8 @@ paths:
   /api/public/v1/filters/crm-fields:
     get:
       operationId: getCrmFields
-      summary: List configured CRM fields for filtering
-      description: CRM field configs are org-scoped because integration state and field configuration are organization-owned.
+      summary: List CRM custom fields
+      description: Returns the CRM fields configured for filtering in your organization, including field type, label, and valid options for enumeration fields. Use this to build `crmCustomFieldFilters` in your requests.
       tags: [Filters]
       security:
         - bearerAuth: []
@@ -937,12 +971,75 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  /api/public/v1/call-types:
+    get:
+      operationId: listCallTypes
+      summary: List call types
+      description: Returns all active call types for your team (e.g., "Discovery Call", "Demo", "QBR"), including a count of how many calls have each type.
+      x-mint:
+        content: |
+          <Tip>Use the `key` values from this response to populate `callTypes` filters in slice runs and evidence searches.</Tip>
+      tags: [Reference Data]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Team-scoped call types
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [callTypes]
+                    properties:
+                      callTypes:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/PublicCallTypeResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/public/v1/elements:
+    get:
+      operationId: listElements
+      summary: List elements
+      description: Returns all active analysis elements for your team (e.g., "Budget Confirmation", "Competitive Mention"). Elements are the specific things a slice evaluates in your calls.
+      x-mint:
+        content: |
+          <Tip>Use the `key` values from this response as `elementKeys` when searching evidence across runs.</Tip>
+      tags: [Reference Data]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Team-scoped elements
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [elements]
+                    properties:
+                      elements:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/PublicElementResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
-      description: "API key with sk_ prefix. Obtain from OrgSettings > API Keys."
+      description: "API key with sk_ prefix. Create one in Org Settings → API Keys."
+      x-default: "sk_your_api_key"
 
   responses:
     Unauthorized:
@@ -1040,7 +1137,7 @@ components:
 
     PublicPostSearchRequest:
       type: object
-      description: Team-scoped structured post search request. Send an empty JSON object (`{}`) to return recent posts. CRM filter values reference org-scoped CRM objects, but returned posts remain team-scoped.
+      description: Post search filters. Send an empty body `{}` to return recent posts. All filters are optional.
       properties:
         callTypeId:
           type: array
@@ -1129,34 +1226,41 @@ components:
 
     PublicEvidenceSearchRequest:
       type: object
+      description: Evidence search filters. At least one element key is required.
       required: [elementKeys]
       properties:
         elementKeys:
           type: array
           items:
             type: string
+          description: Element keys to search for (e.g., ["intent_signal", "budget_confirmation"])
         query:
           type: string
+          description: Free-text search across evidence quotes
         callTypes:
           type: array
           items:
             type: string
           maxItems: 100
-          description: Filter transcript evidence by call type key
+          description: Filter by call type keys (e.g., ["discovery_call"])
         callOwnerEmails:
           type: array
           items:
             type: string
+          description: Filter by call owner emails
         dateFrom:
           type: string
           format: date
+          description: Start date (inclusive)
         dateTo:
           type: string
           format: date
+          description: End date (inclusive)
         limit:
           type: integer
           minimum: 1
           maximum: 100
+          description: Maximum results to return (default varies)
 
     PublicPostSummaryResponse:
       type: object
@@ -1521,7 +1625,7 @@ components:
 
     SliceFilterRequest:
       type: object
-      description: Filters for preview-count. dateFrom and dateTo are required. CRM filter values reference org-scoped CRM objects, but matched results remain team-scoped.
+      description: Filters for preview count. `dateFrom` and `dateTo` are required. All other filters are optional.
       required: [dateFrom, dateTo]
       properties:
         dateFrom:
@@ -1587,7 +1691,7 @@ components:
 
     RunSliceRequest:
       type: object
-      description: Filters for slice run. dateFrom and dateTo use ISO-8601 datetime. CRM filter values reference org-scoped CRM objects, but execution remains team-scoped.
+      description: Filters and options for starting a slice run. All fields are optional — omit filters to analyze all recent calls.
       properties:
         dateFrom:
           type: string
@@ -1741,7 +1845,7 @@ components:
         matchedCallCount:
           type: integer
           nullable: true
-          description: Total calls matching filters (null until evidence summary populated)
+          description: Total calls matching filters (null while the run is still in progress)
           example: 87
         callsAnalyzed:
           type: integer
@@ -1780,12 +1884,12 @@ components:
         phase:
           type: string
           enum: [queued, gathering_evidence, analyzing_calls, synthesizing, completed, failed]
-          description: Coarse execution phase for the run
+          description: Current execution phase — use this for more granular progress tracking than `status`
           example: analyzing_calls
         matchedCallCount:
           type: integer
           nullable: true
-          description: Total calls matching filters (null until evidence summary populated)
+          description: Total calls matching filters (null while the run is still in progress)
           example: 87
         callsAnalyzed:
           type: integer

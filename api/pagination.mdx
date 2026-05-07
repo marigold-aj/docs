@@ -1,20 +1,18 @@
 ---
 title: "Pagination"
-description: "How to page through large result sets."
+description: "The OnePerfectSlice API uses offset-based pagination. Pass limit and offset as query parameters to control which page of results you receive."
 ---
-
-List endpoints use **offset-based pagination** with `limit` and `offset` parameters.
 
 ## Request parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `limit` | integer | 20 | Number of results per page (1 to 100) |
-| `offset` | integer | 0 | Number of results to skip |
+| Parameter | Type | Default | Range | What it does |
+|-----------|------|---------|-------|-------------|
+| `limit` | integer | 20 | 1–100 | How many results to return per page |
+| `offset` | integer | 0 | 0+ | How many results to skip before starting the page |
 
 ## Response metadata
 
-Paginated responses include a `meta.pagination` object:
+Every paginated response includes a `meta.pagination` object that tells you where you are in the result set:
 
 ```json
 {
@@ -30,19 +28,25 @@ Paginated responses include a `meta.pagination` object:
 }
 ```
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `totalCount` | integer | Total number of results across all pages |
-| `hasMore` | boolean | Whether more results exist beyond the current page |
-| `limit` | integer | Number of results per page (echoed from request) |
-| `offset` | integer | Current offset into the result set (echoed from request) |
+| Field | Type | What it tells you |
+|-------|------|-------------------|
+| `totalCount` | integer | Total results across all pages |
+| `hasMore` | boolean | Whether there are more pages after this one |
+| `limit` | integer | Page size (echoed from your request) |
+| `offset` | integer | Current position in the result set |
 
-## Paginated endpoints
+## Which endpoints are paginated?
 
-- `GET /slice-runs` — list run history
-- `POST /posts/search` — search posts
+| Endpoint | What it returns |
+|----------|----------------|
+| `GET /slice-runs` | Run history for your team |
+| `POST /posts/search` | Summaries and scorecards matching your filters |
 
-## Example
+All other endpoints return the full result set in a single response.
+
+## Fetching all pages
+
+Use the `hasMore` field to loop through pages. Increment `offset` by `limit` each time until `hasMore` is `false`.
 
 <CodeGroup>
 ```bash cURL
@@ -67,10 +71,10 @@ limit = 20
 
 while True:
     resp = requests.get(base, headers=headers, params={"limit": limit, "offset": offset})
-    body = resp.json()
-    all_runs.extend(body["data"])
+    page = resp.json()
+    all_runs.extend(page["data"])
 
-    if not body["meta"]["pagination"]["hasMore"]:
+    if not page["meta"]["pagination"]["hasMore"]:
         break
     offset += limit
 
@@ -81,16 +85,16 @@ print(f"Fetched {len(all_runs)} runs")
 const headers = { Authorization: "Bearer sk_your_api_key" };
 const base = "https://app.oneperfectslice.ai/api/public/v1/slice-runs";
 
-const allRuns = [];
+const allRuns: any[] = [];
 let offset = 0;
 const limit = 20;
 
 while (true) {
   const resp = await fetch(`${base}?limit=${limit}&offset=${offset}`, { headers });
-  const body = await resp.json();
-  allRuns.push(...body.data);
+  const page = await resp.json();
+  allRuns.push(...page.data);
 
-  if (!body.meta.pagination.hasMore) break;
+  if (!page.meta.pagination.hasMore) break;
   offset += limit;
 }
 

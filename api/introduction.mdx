@@ -1,9 +1,34 @@
 ---
-title: "Introduction"
-description: "Programmatic access to One Perfect Slice — slices, runs, posts, and evidence."
+title: "Getting Started"
+description: "The OnePerfectSlice API lets you programmatically analyze sales conversations, run AI-powered insights, retrieve call scorecards, and search evidence — all from your own code or agent workflows."
 ---
 
-The OPS Public API is a REST API that returns JSON. Use it to run AI-powered analysis on your sales conversations, poll for results, search posts, and retrieve evidence.
+Use the API to connect OnePerfectSlice to your existing workflows — pipe structured context into Zapier, n8n, Make, or Clay, sync data back to your CRM, or build custom automations on top of OnePerfectSlice.
+
+## What you can do
+
+| Use case | Endpoints |
+|----------|-----------|
+| **Run AI analysis** on calls matching your filters | [Slices](/api/slices) — list templates, preview matched calls, start async runs |
+| **Poll for results** and retrieve structured output | [Slice Runs](/api/slice-runs) — check status, get results, fetch evidence |
+| **Search summaries and scorecards** across your team | [Posts](/api/posts) — filter by date, call type, rep, CRM deal, and more |
+| **Build filter UIs** with typeahead search | [Filters](/api/filters) — call owners, companies, CRM deals, stages, custom fields |
+| **Discover reference data** for your team | [Reference Data](/api/reference) — call types and analysis elements |
+
+## Get your API key
+
+<Steps>
+  <Step title="Go to Org Settings">
+    Navigate to [app.oneperfectslice.ai/settings](https://app.oneperfectslice.ai/settings) and open the **API Keys** section.
+  </Step>
+  <Step title="Create a key">
+    Click **Create API Key**, give it a name, and select the team it should be scoped to. Your key will be shown once — copy it and store it securely.
+  </Step>
+</Steps>
+
+Your key looks like this: `sk_...` — see [Authentication](/api/authentication) for details on managing keys and security.
+
+## Make your first request
 
 **Base URL**
 
@@ -11,11 +36,37 @@ The OPS Public API is a REST API that returns JSON. Use it to run AI-powered ana
 https://app.oneperfectslice.ai/api/public/v1
 ```
 
-All requests require a Bearer token — see [Authentication](/api/authentication).
+<CodeGroup>
+```bash cURL
+curl https://app.oneperfectslice.ai/api/public/v1/slices \
+  -H "Authorization: Bearer sk_your_api_key"
+```
 
-## Response envelope
+```python Python
+import requests
 
-All successful responses wrap data in a standard envelope:
+resp = requests.get(
+    "https://app.oneperfectslice.ai/api/public/v1/slices",
+    headers={"Authorization": "Bearer sk_your_api_key"}
+)
+slices = resp.json()["data"]["slices"]
+for s in slices:
+    print(f"{s['key']}: {s['title']}")
+```
+
+```typescript TypeScript
+const resp = await fetch(
+  "https://app.oneperfectslice.ai/api/public/v1/slices",
+  { headers: { Authorization: "Bearer sk_your_api_key" } }
+);
+const { data } = await resp.json();
+console.log(data.slices);
+```
+</CodeGroup>
+
+## Response format
+
+Every successful response wraps data in a standard envelope:
 
 ```json
 {
@@ -31,34 +82,19 @@ All successful responses wrap data in a standard envelope:
 }
 ```
 
-The `meta` field is only present on paginated endpoints. Non-paginated endpoints return `{ "data": { ... } }` only.
+The `meta` field appears only on paginated endpoints. See [Pagination](/api/pagination) for details.
 
-## Error envelope
+## Error handling
 
-Error responses use a separate structure with a machine-readable `code` (UPPER_SNAKE_CASE) and a human-readable `message`:
+Errors return a machine-readable code and a human-readable message:
 
 ```json
 {
   "error": {
     "code": "INVALID_TOKEN",
-    "message": "Token is invalid",
-    "details": {}
+    "message": "Token is invalid"
   }
 }
 ```
 
-The `details` field is optional and provides additional context for certain errors. See [Errors](/api/errors) for the full list of error codes.
-
-## Endpoint groups
-
-| Group | Description |
-|-------|-------------|
-| [Slices](/api/slices) | List, inspect, preview, and run AI analysis templates |
-| [Slice Runs](/api/slice-runs) | Poll run status, retrieve results and evidence |
-| [Posts](/api/posts) | Search and retrieve AI-generated summaries and scorecards |
-| [Reference Data](/api/reference) | Call types and elements for your team |
-| [Filters](/api/filters) | Typeahead endpoints for building filter UIs |
-
-## Quickstart
-
-For a step-by-step walkthrough, see the [Quickstart](/quickstart).
+Some errors include a `details` object with additional context. See [Errors](/api/errors) for the full list of error codes and how to handle them.

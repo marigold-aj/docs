@@ -1,276 +1,103 @@
 ---
 title: "Quickstart"
-description: "Get your API key and make your first API call in under 5 minutes."
-icon: "rocket"
+description: "This guide walks you through the first-time experience in OnePerfectSlice. By the end, you'll have calls flowing in, AI-generated summaries and scorecards appearing automatically, and will have run your first slices."
 ---
 
-## 1. Get your API key
+## Set up your workspace
 
 <Steps>
-  <Step title="Go to Org Settings">
-    Navigate to [app.oneperfectslice.ai/settings](https://app.oneperfectslice.ai/settings) and open the **API Keys** section.
+  <Step title="Create your account">
+    Sign up at [app.oneperfectslice.ai](https://app.oneperfectslice.ai) with your work email. You'll receive a verification email — click the link to confirm.
   </Step>
-  <Step title="Create a key">
-    Click **Create API Key**, give it a name, and select the team it should be scoped to. Your key will be shown once — copy it and store it securely.
+  <Step title="Create your org and team">
+    On first login, you'll be prompted to enter your name, create your organization, and set up your first team. Teams are how OnePerfectSlice scopes data — each team sees only its own calls and insights.
+  </Step>
+  <Step title="Invite your team (optional)">
+    From **Org Settings**, invite colleagues by email. They'll receive a link to join your team directly — no separate org creation needed.
   </Step>
 </Steps>
 
-<Warning>
-  API keys grant full read access to your team's data. Never expose them in client-side code, public repos, or logs.
-</Warning>
+<Note>
+  Got an invite link? Click it and follow the prompts — you'll skip org creation and land directly in your team's workspace.
+</Note>
 
-Your key looks like this: `sk_...` (prefixed with `sk_`).
+## Import your call recordings
 
-## 2. List available slices
+OnePerfectSlice needs access to your call transcripts. You can either connect a recording platform or upload calls directly.
 
-<CodeGroup>
-```bash cURL
-curl https://app.oneperfectslice.ai/api/public/v1/slices \
-  -H "Authorization: Bearer sk_your_api_key"
-```
+<Steps>
+  <Step title="Go to Integrations">
+    Navigate to **Org Settings → Integrations** in the app.
+  </Step>
+  <Step title="Connect your platform">
+    Choose your call recording source and follow the authorization flow:
 
-```python Python
-import requests
+    | Platform | How to connect |
+    |----------|---------------|
+    | **Gong** | API key pair — paste your Gong access key and secret |
+    | **Fireflies** | API key — paste your Fireflies API key |
+    | **Fathom** | API key — paste your Fathom API key |
 
-resp = requests.get(
-    "https://app.oneperfectslice.ai/api/public/v1/slices",
-    headers={"Authorization": "Bearer sk_your_api_key"}
-)
-slices = resp.json()["data"]["slices"]
-for s in slices:
-    print(f"{s['key']}: {s['title']}")
-```
+    Don't use one of these? You can also **upload calls directly** from the /transcripts page in the app.
+  </Step>
+  <Step title="Calls are ingested automatically">
+    Once connected, OnePerfectSlice pulls in your existing calls and begins processing new ones as they happen. Each call is [automatically classified](/product/call-types) by type (discovery, demo, QBR, etc.).
+  </Step>
+</Steps>
 
-```typescript TypeScript
-const resp = await fetch(
-  "https://app.oneperfectslice.ai/api/public/v1/slices",
-  { headers: { Authorization: "Bearer sk_your_api_key" } }
-);
-const { data } = await resp.json();
-console.log(data.slices);
-```
-</CodeGroup>
+## Review your posts
 
-```json Response
-{
-  "data": {
-    "slices": [
-      {
-        "key": "high_intent_deals",
-        "title": "High-Intent Deals",
-        "objective": "pipeline",
-        "description": "Surfaces deals showing strong buying signals.",
-        "elementKeys": ["intent_signal", "budget_confirmation"]
-      }
-    ]
-  }
-}
-```
+Within minutes of connecting, AI-generated posts start appearing for your team. Every processed call produces:
 
-## 3. Run a slice
+- **A summary** — topics, decisions, action items, and next steps
+- **A scorecard** — structured evaluation against your team's methodology
 
-Start an async analysis on recent conversations:
+<Steps>
+  <Step title="Open Posts">
+    Navigate to the **Posts** section in the app. You'll see a feed of summaries and scorecards, most recent first.
+  </Step>
+  <Step title="Filter and browse">
+    Use filters to narrow by date, call type, rep, or company. Click into any post to see the full structured output.
+  </Step>
+  <Step title="Understand the structure">
+    Every post is tied to a **call type** — and each call type has its own summary and scorecard template. This means every discovery call is summarized the same way, every demo is scored against the same criteria. That consistency is what enables comparison and pattern matching at scale.
+  </Step>
+</Steps>
 
-<CodeGroup>
-```bash cURL
-curl -X POST https://app.oneperfectslice.ai/api/public/v1/slices/high_intent_deals/run \
-  -H "Authorization: Bearer sk_your_api_key" \
-  -H "Content-Type: application/json" \
-  -H "Idempotency-Key: my-unique-key-123" \
-  -d '{
-    "dateFrom": "2026-03-26T00:00:00Z",
-    "dateTo": "2026-04-26T00:00:00Z"
-  }'
-```
+## Run your first slice
 
-```python Python
-import requests
+Slices go beyond individual calls — they analyze patterns across many conversations to answer a specific business question.
 
-resp = requests.post(
-    "https://app.oneperfectslice.ai/api/public/v1/slices/high_intent_deals/run",
-    headers={
-        "Authorization": "Bearer sk_your_api_key",
-        "Content-Type": "application/json",
-        "Idempotency-Key": "my-unique-key-123",
-    },
-    json={
-        "dateFrom": "2026-03-26T00:00:00Z",
-        "dateTo": "2026-04-26T00:00:00Z",
-    },
-)
-run = resp.json()["data"]
-print(f"Run {run['runId']} started — status: {run['status']}")
-```
+<Steps>
+  <Step title="Open Slices">
+    Navigate to the **Slices** section. You'll see available analysis templates organized by business objective: pipeline, deals, expansion, and product.
+  </Step>
+  <Step title="Pick a slice">
+    Choose one that matches what you're trying to learn. For example:
+    - **Objection Patterns** — what's blocking deals from closing?
+    - **Competitive Intelligence** — who's coming up in conversations and why?
+    - **Campaign Ideas** — what campaigns should you run based on what customers are saying?
+  </Step>
+  <Step title="Set your filters">
+    Choose a date range and optionally filter by call type, rep, company, or CRM deal. Use **Preview Count** to see how many calls match before running.
+  </Step>
+  <Step title="Run">
+    Click run. OnePerfectSlice analyzes the matched calls and returns structured insights backed by evidence — direct quotes from your conversations with confidence scores.
+  </Step>
+</Steps>
 
-```typescript TypeScript
-const resp = await fetch(
-  "https://app.oneperfectslice.ai/api/public/v1/slices/high_intent_deals/run",
-  {
-    method: "POST",
-    headers: {
-      Authorization: "Bearer sk_your_api_key",
-      "Content-Type": "application/json",
-      "Idempotency-Key": "my-unique-key-123",
-    },
-    body: JSON.stringify({
-      dateFrom: "2026-03-26T00:00:00Z",
-      dateTo: "2026-04-26T00:00:00Z",
-    }),
-  }
-);
-const { data } = await resp.json();
-console.log(`Run ${data.runId} started — status: ${data.status}`);
-```
-</CodeGroup>
+## What's next
 
-This returns `202 Accepted` with a `runId`:
-
-```json Response
-{
-  "data": {
-    "runId": 12345,
-    "sliceKey": "high_intent_deals",
-    "sliceTitle": "High-Intent Deals",
-    "status": "running"
-  }
-}
-```
-
-## 4. Poll for results
-
-Check the run status until it completes. Use `suggestedPollAfterSeconds` to determine wait time.
-
-<CodeGroup>
-```bash cURL
-curl https://app.oneperfectslice.ai/api/public/v1/slice-runs/12345 \
-  -H "Authorization: Bearer sk_your_api_key"
-```
-
-```python Python
-import time, requests
-
-headers = {"Authorization": "Bearer sk_your_api_key"}
-
-while True:
-    resp = requests.get(
-        "https://app.oneperfectslice.ai/api/public/v1/slice-runs/12345",
-        headers=headers,
-    )
-    run = resp.json()["data"]
-
-    if run["status"] == "completed":
-        print("Done!", run["result"])
-        break
-    elif run["status"] == "failed":
-        print("Failed:", run["error"])
-        break
-
-    wait = run.get("suggestedPollAfterSeconds", 15)
-    print(f"Status: {run['status']} — polling again in {wait}s")
-    time.sleep(wait)
-```
-
-```typescript TypeScript
-const headers = { Authorization: "Bearer sk_your_api_key" };
-
-while (true) {
-  const resp = await fetch(
-    "https://app.oneperfectslice.ai/api/public/v1/slice-runs/12345",
-    { headers }
-  );
-  const { data: run } = await resp.json();
-
-  if (run.status === "completed") {
-    console.log("Done!", run.result);
-    break;
-  } else if (run.status === "failed") {
-    console.log("Failed:", run.error);
-    break;
-  }
-
-  const wait = (run.suggestedPollAfterSeconds ?? 15) * 1000;
-  console.log(`Status: ${run.status} — polling in ${wait / 1000}s`);
-  await new Promise((r) => setTimeout(r, wait));
-}
-```
-</CodeGroup>
-
-## 5. Get evidence
-
-Once a run completes, retrieve the supporting evidence:
-
-<CodeGroup>
-```bash cURL
-curl https://app.oneperfectslice.ai/api/public/v1/slice-runs/12345/evidence \
-  -H "Authorization: Bearer sk_your_api_key"
-```
-
-```python Python
-resp = requests.get(
-    "https://app.oneperfectslice.ai/api/public/v1/slice-runs/12345/evidence",
-    headers={"Authorization": "Bearer sk_your_api_key"},
-)
-evidence = resp.json()["data"]
-for key, element in evidence["elements"].items():
-    print(f"{key}: {element['count']} items")
-    for item in element["items"]:
-        print(f"  \"{item['quote']}\" (confidence: {item['confidence']})")
-```
-
-```typescript TypeScript
-const resp = await fetch(
-  "https://app.oneperfectslice.ai/api/public/v1/slice-runs/12345/evidence",
-  { headers: { Authorization: "Bearer sk_your_api_key" } }
-);
-const { data } = await resp.json();
-for (const [key, element] of Object.entries(data.elements)) {
-  console.log(`${key}: ${element.count} items`);
-  element.items.forEach((item) =>
-    console.log(`  "${item.quote}" (confidence: ${item.confidence})`)
-  );
-}
-```
-</CodeGroup>
-
-```json Response
-{
-  "data": {
-    "summary": {
-      "totalSources": 15,
-      "totalElements": 2,
-      "sourceBreakdown": { "transcript": 12, "crm_deal": 3 }
-    },
-    "elements": {
-      "intent_signal": {
-        "count": 8,
-        "items": [
-          {
-            "quote": "We're aiming to have a vendor selected by end of Q2.",
-            "source": {
-              "type": "transcript",
-              "id": "file:98123",
-              "label": "Acme Corp — Discovery Call",
-              "date": "2026-04-12"
-            },
-            "confidence": 0.91
-          }
-        ]
-      }
-    }
-  }
-}
-```
-
-## What's next?
+You're set up. From here:
 
 <Columns cols={3}>
-  <Card title="API Reference" icon="terminal" href="/api-reference">
-    Explore all 20 endpoints with full schemas.
+  <Card title="Explore slices" href="/product/slices">
+    Learn about the 27 available analysis templates and how to get the most from them.
   </Card>
-  <Card title="MCP Server" icon="robot" href="/mcp/overview">
-    Connect OPS to Claude and other AI agents.
+  <Card title="Connect your CRM" href="/integrations/hubspot">
+    Add HubSpot to enrich your analyses with deal and company context.
   </Card>
-  <Card title="Search Posts" icon="magnifying-glass" href="/product/posts">
-    Find summaries and scorecards across your calls.
+  <Card title="Connect an AI agent" href="/mcp/overview">
+    Set up MCP so Claude can query your data conversationally.
   </Card>
 </Columns>

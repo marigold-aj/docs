@@ -1,0 +1,38 @@
+---
+title: "Roles & Permissions"
+description: "OnePerfectSlice uses role-based access control at two levels — organization and team. Higher roles inherit all permissions from the roles below them."
+---
+
+## Roles
+
+| Role | Scope | Description |
+|------|-------|-------------|
+| **Org Admin** | Organization | Full access — manage users, settings, integrations, billing, and API keys across the org |
+| **Team Admin** | Team | Manage team members and team-level settings |
+| **Member** | Team | Standard access — view and interact with calls, summaries, scorecards, and slices |
+| **Viewer** | Team | Read-only access |
+| **Billing** | Organization | View and manage billing only |
+
+## What each role can do
+
+| Action | Org Admin | Team Admin | Member | Viewer |
+|--------|:-:|:-:|:-:|:-:|
+| View calls, summaries, scorecards | Yes | Yes | Yes | Yes |
+| Run slices | Yes | Yes | Yes | No |
+| Upload calls | Yes | Yes | Yes | No |
+| Delete calls | Yes | Yes | No | No |
+| Manage team members | Yes | Yes | No | No |
+| Connect integrations (Gong, HubSpot, etc.) | Yes | No | No | No |
+| Create API keys | Yes | No | No | No |
+| Manage billing | Yes | No | No | No |
+| Manage org settings | Yes | No | No | No |
+| Access all teams in org | Yes | No | No | No |
+
+## How roles are assigned
+
+- When you create an organization, you become the **Org Admin**
+- When you invite someone, you choose their role
+- **Org-level roles** (Org Admin) grant access across all teams in the organization
+- **Team-level roles** (Team Admin, Member, Viewer) are scoped to a specific team
+- A user can have different roles on different teams
+

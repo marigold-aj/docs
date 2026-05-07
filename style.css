@@ -195,33 +195,58 @@ pre {
 }
 
 /* ===== Callouts / Alerts ===== */
+div.callout[class*="blue"] {
+  --tw-border-opacity: 1 !important;
+  --tw-bg-opacity: 1 !important;
+  border-color: #b8894a !important;
+  background-color: #fdf1e0 !important;
+  color: #b8894a !important;
+}
+
+div.callout[class*="blue"] * {
+  color: #b8894a !important;
+}
+
+.dark div.callout[class*="blue"] {
+  border-color: rgba(237, 191, 134, 0.4) !important;
+  background-color: rgba(237, 191, 134, 0.1) !important;
+  color: #b8894a !important;
+}
+
+.dark div.callout[class*="blue"] * {
+  color: #b8894a !important;
+}
+
 [data-callout="info"] {
-  border-color: #10a690;
-  background: #e6f7f5;
+  border-color: #10a690 !important;
+  background: #e6f7f5 !important;
 }
 
 [data-callout="warning"] {
-  border-color: #edbf86;
-  background: #fdf1e0;
+  border-color: #b8894a !important;
+  background: #fdf1e0 !important;
 }
 
 [data-callout="danger"],
 [data-callout="error"] {
-  border-color: #99341d;
-  background: #fef0ee;
+  border-color: #99341d !important;
+  background: #fef0ee !important;
 }
 
 .dark [data-callout="info"] {
-  background: rgba(16, 166, 144, 0.1);
+  border-color: rgba(16, 166, 144, 0.4) !important;
+  background: rgba(16, 166, 144, 0.1) !important;
 }
 
 .dark [data-callout="warning"] {
-  background: rgba(237, 191, 134, 0.1);
+  border-color: rgba(237, 191, 134, 0.4) !important;
+  background: rgba(237, 191, 134, 0.1) !important;
 }
 
 .dark [data-callout="danger"],
 .dark [data-callout="error"] {
-  background: rgba(153, 52, 29, 0.15);
+  border-color: rgba(153, 52, 29, 0.4) !important;
+  background: rgba(153, 52, 29, 0.15) !important;
 }
 
 /* ===== Tables ===== */

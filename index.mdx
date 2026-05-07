@@ -1,44 +1,43 @@
 ---
 title: "Overview"
-description: "Run AI-powered analysis on your sales conversations. Surface structured insights, evidence, and scorecards — via the app, API, or MCP."
-icon: "house"
+description: "OnePerfectSlice is a context-as-a-service platform for B2B GTM teams. It builds structured, evidence-backed context compiled from your data and delivers it to AI agents, workflows, and teams — so everyone can make smarter decisions, faster, with fewer hand-offs."
 ---
 
-Copy this snippet to start analyzing calls. See the [full quickstart](/quickstart) for more details.
+## Who it's for
 
-<CodeGroup>
-```python Python
-import requests
+- **Sales & Marketing Operations** — make every team, agent, and workflow customer-aware
+- **GTM Engineers and Marketing Engineers** — build context-aware automations and AI workflows without stitching together fragmented data
+- **Demand Gen Teams** — improve targeting and campaign performance with timely signals from across your stack
+- **Product Marketing Teams** — uncover customer, market, and competitive intelligence to sharpen positioning and messaging
+- **Sales Enablement Teams** — coach reps with evidence from real conversations and reinforce winning behaviors at scale
 
-resp = requests.get(
-    "https://app.oneperfectslice.ai/api/public/v1/slices",
-    headers={"Authorization": "Bearer sk_your_api_key"}
-)
-slices = resp.json()["data"]["slices"]
-```
+## What you can do
 
-```typescript TypeScript
-const resp = await fetch(
-  "https://app.oneperfectslice.ai/api/public/v1/slices",
-  { headers: { Authorization: "Bearer sk_your_api_key" } }
-);
-const { data } = await resp.json();
-```
+| Capability | Description |
+|---|---|
+| **Feed your AI agents** | Agents get real-time, compiled context from across your stack via MCP. No copy-pasting, no manual context-building. |
+| **Power your workflows** | Connect OnePerfectSlice to Zapier, n8n, Make, Clay, or your own code via the public API. |
+| **Equip your team** | Summaries, scorecards, and evidence show up where your people work — decisions happen faster, with less back-and-forth. |
 
-```bash cURL
-curl https://app.oneperfectslice.ai/api/public/v1/slices \
-  -H "Authorization: Bearer sk_your_api_key"
-```
-</CodeGroup>
+## Go deeper
 
 <Columns cols={3}>
-  <Card title="Product" img="/images/cards/product.png" href="/product/slices">
-    Learn how slices, scorecards, and posts work.
+  <Card title="Slices" href="/product/slices">
+    AI analysis templates that surface structured insights tied to business goal and role.
   </Card>
-  <Card title="MCP" img="/images/cards/mcp.png" href="/mcp/overview">
-    Connect OPS to Claude Code, Claude Desktop, and other agents.
+  <Card title="Summaries" href="/product/posts">
+    Every call is auto-classified by type, then summarized with a GTM-focused template — enabling consistent comparison and pattern matching across your team.
   </Card>
-  <Card title="API" img="/images/cards/api.png" href="/quickstart">
-    Call OPS from your code — get an API key and run your first request.
+  <Card title="Scorecards" href="/product/scorecards">
+    Each call type has a structured scorecard template — reps are evaluated against consistent criteria so you can spot trends at scale.
+  </Card>
+  <Card title="MCP Server" href="/mcp/overview">
+    Connect AI agents to compiled context from across your stack — ask questions in natural language.
+  </Card>
+  <Card title="API Reference" href="/api/introduction">
+    20 REST endpoints for programmatic access to slices, runs, posts, and evidence.
+  </Card>
+  <Card title="Integrations" href="/integrations/index">
+    Gong, Fireflies, Fathom, HubSpot, Notion — and what's coming next.
   </Card>
 </Columns>

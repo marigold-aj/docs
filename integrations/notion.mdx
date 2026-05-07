@@ -1,0 +1,46 @@
+---
+title: "Notion"
+description: "Connect Notion to OnePerfectSlice to automatically push call summaries, scorecards, and slice results to your team's workspace."
+---
+
+## Connect Notion
+
+<Steps>
+  <Step title="Open Org Settings">
+    Navigate to **Org Settings → Integrations**. You'll need Org Admin permissions.
+  </Step>
+  <Step title="Click Connect on Notion">
+    An OAuth popup will open — authorize OnePerfectSlice to access your Notion workspace.
+  </Step>
+  <Step title="Select a destination page">
+    After connecting, a settings modal opens. Search for and select the Notion page or database where you want content to land.
+  </Step>
+  <Step title="Choose what to sync">
+    Enable the sync types you want:
+
+    | Sync type | What gets pushed to Notion |
+    |-----------|---------------------------|
+    | **Call Reviews** | Summaries and scorecards for each processed call |
+    | **Insight Briefs** | AI-generated insight briefs |
+    | **Slice Runs** | Results from completed slice analyses |
+
+    Each toggle can be turned on or off independently.
+  </Step>
+</Steps>
+
+## After connecting
+
+- Content syncs automatically when new results are generated
+- Each sync type tracks its own "last synced" timestamp
+- You can change the destination page or toggle sync types at any time from the Notion settings card
+
+## Managing your connection
+
+From the Notion integration card in Org Settings, you can:
+
+| Action | What it does |
+|--------|-------------|
+| **Edit destination** | Change which Notion page receives synced content |
+| **Toggle sync types** | Turn individual sync types on or off |
+| **Reconnect** | Re-authorize if your Notion token was revoked |
+| **Disconnect** | Remove the connection (existing Notion pages are preserved) |

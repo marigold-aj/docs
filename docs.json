@@ -41,21 +41,24 @@
             "group": "Getting Started",
             "pages": [
               "index",
-              "quickstart"
+              "quickstart",
+              "integrations/index"
             ]
           },
           {
             "group": "Product",
             "pages": [
               "product/slices",
+              "product/summaries",
               "product/scorecards",
-              "product/posts"
+              "product/call-types"
             ]
           },
           {
-            "group": "Integrations",
+            "group": "Accounts",
             "pages": [
-              "integrations/hubspot"
+              "accounts/overview",
+              "accounts/roles-and-permissions"
             ]
           }
         ]
@@ -64,16 +67,18 @@
         "tab": "MCP",
         "groups": [
           {
-            "group": "Get started",
+            "group": "MCP",
             "pages": [
-              "mcp/overview"
+              "mcp/overview",
+              "mcp/tools"
             ]
           },
           {
             "group": "Setup",
             "pages": [
               "mcp/claude-code",
-              "mcp/claude-desktop"
+              "mcp/claude-desktop",
+              "mcp/codex"
             ]
           }
         ]
@@ -82,17 +87,18 @@
         "tab": "API",
         "groups": [
           {
-            "group": "Overview",
+            "group": "API",
             "pages": [
               "api/introduction",
               "api/authentication",
+              "api/endpoints",
               "api/rate-limiting",
               "api/pagination",
               "api/errors"
             ]
           },
           {
-            "group": "Endpoints",
+            "group": "Endpoint Details",
             "openapi": "api/openapi.yaml"
           },
           {
@@ -113,6 +119,14 @@
     {
       "source": "/product/api-keys",
       "destination": "/api/authentication"
+    },
+    {
+      "source": "/product/posts",
+      "destination": "/product/summaries"
+    },
+    {
+      "source": "/product/call-classification",
+      "destination": "/product/call-types"
     }
   ],
   "logo": {
@@ -129,6 +143,16 @@
     "auth": {
       "method": "bearer",
       "name": "Authorization"
+    },
+    "examples": {
+      "languages": ["python", "javascript", "curl"],
+      "defaults": "required",
+      "prefill": true,
+      "autogenerate": true
+    },
+    "playground": {
+      "display": "interactive",
+      "proxy": true
     }
   }
 }

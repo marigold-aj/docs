@@ -1,45 +1,55 @@
 ---
 title: "Scorecards"
-description: "Structured evaluation of sales calls against your team's methodology."
-icon: "clipboard-check"
+description: "OnePerfectSlice automatically scores every call against a structured evaluation template — matched to the call type. Scorecards don't just tell you how a call went; they produce consistent, comparable data across every rep and every conversation."
 ---
 
-## What are scorecards?
+## How scorecards work
 
-Scorecards evaluate rep performance on individual calls by scoring a set of elements — things like "discovery questions asked," "competitive positioning," or "next steps confirmed." Each element gets a color-coded score with coaching feedback.
+1. A call is ingested from your [connected recording platform](/integrations/index) or uploaded directly
+2. The call is [automatically classified](/product/call-types) into a type (discovery, demo, etc.)
+3. The scorecard template matched to that call type is applied
+4. AI evaluates the transcript element by element, scoring each one with evidence from the conversation
+5. A structured scorecard is generated and available to your team, agents, and workflows
 
-## How scoring works
+This happens automatically for every call — no manual trigger required.
 
-Each element in a scorecard is scored on a three-point scale:
+Each element is scored on a three-point scale:
 
-| Score | Meaning | Description |
-|-------|---------|-------------|
-| **G** (Green) | Thorough | The rep covered this element well |
-| **Y** (Yellow) | Partial | The rep touched on it but missed key aspects |
-| **R** (Red) | Missed | The element was not addressed |
+| Score | What it means |
+|-------|---------------|
+| **G** (Green) | Rep covered this element thoroughly |
+| **Y** (Yellow) | Partially addressed — key aspects were missed |
+| **R** (Red) | Not addressed |
 
 For each score, the AI provides:
-- **Rationale** — why it gave that score, with direct quotes from the call
-- **Suggestion** — specific coaching advice for improvement
+- **Rationale** — why it scored that way, with direct quotes from the call
+- **Coaching suggestion** — specific, actionable advice for improvement
 
-## Templates
+## Structured by call type
 
-Scorecards are powered by templates — customizable evaluation frameworks that define which elements to score and in what order.
+Every call type has its own scorecard template — so a discovery call is evaluated against different elements than a demo or a renewal call.
 
-Templates can be configured at multiple levels:
-- **System-level** — default templates available to all teams
-- **Org-level** — custom templates for your organization
-- **Team-level** — team-specific templates
+Because every call of the same type is scored against the same criteria, you can compare across reps, track improvement over time, and identify team-wide patterns — not just individual performance.
 
-Templates go through a versioning lifecycle: **draft** → **sandbox** (testing) → **main** (active) → **archived**.
+For example:
+- **Discovery Call scorecards** evaluate decision criteria explored, pain identification, and initiative maturity
+- **Demo Call scorecards** evaluate whether the demo mapped to pain, objections addressed live, and next steps
+- **Renewal Call scorecards** evaluate value anchoring, risk handling, and competitive awareness
 
-## Viewing scorecards
+See [Call Classification](/product/call-types) for the full list of call types and what each template covers.
 
-Scorecards appear as [posts](/product/posts) in your feed. You can:
-- Filter by call type, date range, or team member
-- Click into any scorecard to see element-by-element scores
-- Review the AI's rationale and coaching suggestions for each element
+## Access scorecards anywhere
 
-## Multi-pass scoring
+Scorecards are available in the app, through the [API](/api/introduction), and to AI agents via the [MCP server](/mcp/overview).
 
-For deeper evaluation, scorecards can use multi-pass scoring — focusing on fewer elements per pass to provide more detailed analysis. This trades speed for depth.
+<Columns cols={3}>
+  <Card title="In the app" href="https://app.oneperfectslice.ai">
+    Browse, filter, and drill into element-by-element scores.
+  </Card>
+  <Card title="Via the API" href="/api/endpoints#posts">
+    Search and retrieve scorecards programmatically.
+  </Card>
+  <Card title="Via MCP" href="/mcp/tools#search_posts">
+    Ask Claude to find scorecards — "Show me scorecards where reps scored Red on objection handling."
+  </Card>
+</Columns>

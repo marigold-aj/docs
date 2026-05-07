@@ -1,0 +1,46 @@
+---
+title: "Gong"
+description: "Connect Gong to OnePerfectSlice to automatically import your call recordings for AI analysis, summaries, and scorecards."
+---
+
+## Connect Gong
+
+<Steps>
+  <Step title="Open Org Settings">
+    Navigate to **Org Settings → Integrations**. You'll need Org Admin permissions.
+  </Step>
+  <Step title="Click Connect on Gong">
+    A modal will open asking for your Gong API credentials.
+  </Step>
+  <Step title="Enter your credentials">
+    You'll need three things from Gong:
+
+    | Field | Where to find it |
+    |-------|-----------------|
+    | **API Base URL** | Your regional Gong API endpoint (e.g., `https://us-12345.api.gong.io`) |
+    | **Access Key** | From your Gong API settings |
+    | **Access Key Secret** | From your Gong API settings |
+
+    Not sure where to find these? See [Gong's API access guide](https://help.gong.io/docs/receive-access-to-the-api).
+  </Step>
+  <Step title="Import your calls">
+    Once connected, OnePerfectSlice imports your recent calls and begins syncing new ones automatically every 15 minutes.
+  </Step>
+</Steps>
+
+## After connecting
+
+- Existing calls are backfilled automatically (the number depends on your plan)
+- New calls sync every **15 minutes**
+- Each call is [automatically classified](/product/call-types), then summaries and scorecards are generated
+
+## Managing your connection
+
+From the Gong integration card in Org Settings, you can:
+
+| Action | What it does |
+|--------|-------------|
+| **Pause** | Stop syncing new calls (existing data is preserved) |
+| **Resume** | Restart syncing |
+| **Reconnect** | Update your credentials without losing existing data |
+| **Disconnect** | Remove the connection (existing calls are preserved) |
