@@ -133,6 +133,11 @@
     "light": "https://cdn.prod.website-files.com/6798f568c3016c7a6d112142/679d400304f43a0293bc36b1_oneperfectslice-logo.svg",
     "dark": "https://cdn.prod.website-files.com/6798f568c3016c7a6d112142/679d400304f43a0293bc36b1_oneperfectslice-logo.svg"
   },
+  "integrations": {
+    "ga4": {
+      "measurementId": "G-FWXSKEJF5P"
+    }
+  },
   "footer": {
     "socials": {
       "linkedin": "https://linkedin.com/company/oneperfectslice"
