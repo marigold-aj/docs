@@ -1,26 +1,38 @@
 # OnePerfectSlice Documentation
 
-> OnePerfectSlice analyzes sales conversations with AI to surface structured insights, evidence, and scorecards.
+> OnePerfectSlice is a context-as-a-service platform for B2B GTM teams. It builds structured, evidence-backed context compiled from your data and delivers it to AI agents, workflows, and teams — so everyone can make smarter decisions, faster, with fewer hand-offs.
 
 ## Docs
-- [Overview](https://oneperfectslice.mintlify.app/)
-- [Quickstart](https://oneperfectslice.mintlify.app/quickstart)
-- [Slices](https://oneperfectslice.mintlify.app/product/slices)
-- [Scorecards](https://oneperfectslice.mintlify.app/product/scorecards)
-- [Posts](https://oneperfectslice.mintlify.app/product/posts)
-- [HubSpot Integration](https://oneperfectslice.mintlify.app/integrations/hubspot)
+- [Overview](https://docs.oneperfectslice.ai/)
+- [Quickstart](https://docs.oneperfectslice.ai/quickstart)
+- [Integrations](https://docs.oneperfectslice.ai/integrations/index)
+- [Slices](https://docs.oneperfectslice.ai/product/slices)
+- [Summaries](https://docs.oneperfectslice.ai/product/summaries)
+- [Scorecards](https://docs.oneperfectslice.ai/product/scorecards)
+- [Call Types](https://docs.oneperfectslice.ai/product/call-types)
+- [Accounts Overview](https://docs.oneperfectslice.ai/accounts/overview)
+- [Roles & Permissions](https://docs.oneperfectslice.ai/accounts/roles-and-permissions)
+
+## Integrations
+- [HubSpot](https://docs.oneperfectslice.ai/integrations/hubspot)
+- [Gong](https://docs.oneperfectslice.ai/integrations/gong)
+- [Fireflies](https://docs.oneperfectslice.ai/integrations/fireflies)
+- [Fathom](https://docs.oneperfectslice.ai/integrations/fathom)
+- [Notion](https://docs.oneperfectslice.ai/integrations/notion)
 
 ## API Reference
-- [Getting Started](https://oneperfectslice.mintlify.app/api/introduction)
-- [Authentication](https://oneperfectslice.mintlify.app/api/authentication)
-- [Endpoints](https://oneperfectslice.mintlify.app/api/endpoints)
-- [Rate Limiting](https://oneperfectslice.mintlify.app/api/rate-limiting)
-- [Pagination](https://oneperfectslice.mintlify.app/api/pagination)
-- [Errors](https://oneperfectslice.mintlify.app/api/errors)
-- [Data Models](https://oneperfectslice.mintlify.app/api/data-models)
-- [OpenAPI Spec](https://oneperfectslice.mintlify.app/api/openapi.yaml)
+- [Getting Started](https://docs.oneperfectslice.ai/api/introduction)
+- [Authentication](https://docs.oneperfectslice.ai/api/authentication)
+- [Endpoints](https://docs.oneperfectslice.ai/api/endpoints)
+- [Rate Limiting](https://docs.oneperfectslice.ai/api/rate-limiting)
+- [Pagination](https://docs.oneperfectslice.ai/api/pagination)
+- [Errors](https://docs.oneperfectslice.ai/api/errors)
+- [Data Models](https://docs.oneperfectslice.ai/api/data-models)
+- [OpenAPI Spec](https://docs.oneperfectslice.ai/api/openapi.yaml)
 
 ## MCP Server
-- [Overview](https://oneperfectslice.mintlify.app/mcp/overview)
-- [Claude Code Setup](https://oneperfectslice.mintlify.app/mcp/claude-code)
-- [Claude Desktop Setup](https://oneperfectslice.mintlify.app/mcp/claude-desktop)
+- [Getting Started](https://docs.oneperfectslice.ai/mcp/overview)
+- [Tools Reference](https://docs.oneperfectslice.ai/mcp/tools)
+- [Claude Code Setup](https://docs.oneperfectslice.ai/mcp/claude-code)
+- [Claude Desktop Setup](https://docs.oneperfectslice.ai/mcp/claude-desktop)
+- [Codex Setup](https://docs.oneperfectslice.ai/mcp/codex)
