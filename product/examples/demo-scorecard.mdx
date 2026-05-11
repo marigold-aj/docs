@@ -1,0 +1,40 @@
+---
+title: "Example: Demo Call Scorecard"
+description: "A real example of the structured scorecard OnePerfectSlice generates for a demo call — evaluating pain reconnection, solution fit, objection handling, and next steps with G/Y/R ratings and coaching."
+---
+
+This is an example scorecard generated from a demo call between a solutions engineer at **Vetro** (a B2B data integration platform) and the technical team at **Ridgeline Financial**, a Series C fintech company.
+
+<Info>All names, companies, and details are fictional. The structure and depth of the output reflect what OnePerfectSlice actually produces.</Info>
+
+---
+
+## BLUF (Bottom Line Up Front)
+
+The SE delivered a strong technical demo that connected well to Ridgeline's schema governance pain, but missed an opportunity to reconfirm the full pain landscape before jumping into features. The schema drift detection moment was a genuine turning point — David's production incident reference shifted the room from evaluation mode to envisioning mode. Two open items threaten momentum: the streaming throughput gap needs a benchmark within two weeks, and the PCI-DSS question was deferred without a clear owner or timeline. The deal has technical credibility but the clock is ticking against their Q3 budget lock.
+
+---
+
+## Next Moves
+
+- **Value Move**: Provision the benchmark environment this week and send David a preview of the test plan — don't wait for him to ask. Show throughput results at 2M+ transactions/day within two weeks to close the performance objection before it becomes a blocker.
+- **Objection Move**: Get the PCI-DSS mapping question to Vetro's security team today and schedule a CISO-to-CISO call within the next week. David flagged this as a blocker — every day without a scheduled security conversation is a day closer to the budget lock.
+- **Stakeholder Move**: Send David the build-vs-buy cost comparison he needs for the CFO conversation. He told you what he needs — deliver it before he has to ask again, and frame it around total cost of pipeline maintenance, not just licensing.
+
+---
+
+## Scorecard
+
+| Score | Element | Rationale |
+|-------|---------|-----------|
+| 🟡 | **Pain Reconnection** | The SE moved quickly into the demo without explicitly reconfirming the pain points from discovery. David's schema drift comment ("we had a production incident last month because of exactly this") surfaced pain organically, but the SE didn't build on it — didn't ask what the incident cost them, how long it took to resolve, or whether it affected downstream reporting. |
+| 🟢 | **Solution Fit Validated** | The schema drift detection demo was highly effective — it demonstrated the exact problem David described, using a scenario that mapped to a real incident. The lineage visualization engaged a previously silent stakeholder. The SE made a strong connection between Vetro's capabilities and Ridgeline's specific technical environment (Kafka, Snowflake, PostgreSQL). |
+| 🟡 | **Use Cases Confirmed** | The primary use case (replace custom Kafka-to-Snowflake pipeline) was validated through the demo, and schema governance was confirmed as a strong fit. However, the SE didn't confirm whether there are secondary use cases beyond the pipeline replacement. The compliance use case emerged organically but wasn't formally scoped or confirmed as a requirement. |
+| 🟡 | **Objections Addressed Live** | The SE handled the throughput objection well tactically — acknowledged the gap, proposed a benchmark, and David accepted. But the PCI-DSS question was deferred without a clear next step: no owner assigned, no timeline committed, and no interim answer provided. David explicitly flagged this as a blocker for the CISO, and the SE left it hanging. |
+| 🔴 | **Next Steps** | The demo ended without clearly defined next steps. The benchmark was agreed upon conceptually but no timeline was set. The PCI-DSS security review was identified as needed but no call was scheduled. The build-vs-buy analysis David mentioned wanting was acknowledged but not committed to. Three open items, zero with dates or owners attached. |
+
+---
+
+<Card title="How scorecards work" icon="arrow-right" href="/product/scorecards">
+  Learn how OnePerfectSlice evaluates every call element-by-element with evidence-backed scoring and coaching suggestions.
+</Card>

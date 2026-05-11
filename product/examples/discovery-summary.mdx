@@ -1,0 +1,50 @@
+---
+title: "Example: Discovery Call Summary"
+description: "A real example of the structured summary OnePerfectSlice generates for a discovery call — showing pain themes, value hooks, and GTM-ready slices automatically extracted from the conversation."
+---
+
+This is an example summary generated from a discovery call between a sales rep at **Vetro** (a B2B data integration platform) and a prospect at **Lumen Health**, a mid-market healthcare analytics company.
+
+<Info>All names, companies, and details are fictional. The structure and depth of the output reflect what OnePerfectSlice actually produces.</Info>
+
+---
+
+## BLUF (Bottom Line Up Front)
+
+Lumen Health is running three separate ETL tools across clinical, claims, and operational data and needs a unified pipeline with compliance-ready lineage before Q4 reporting season — driven by board pressure and two new state expansions that trigger audit requirements they can't currently meet.
+
+---
+
+## Pain Themes
+
+- **Fragmented pipeline ownership**: Three separate ETL tools managed by different teams with no shared schema registry, leading to conflicting data definitions across departments.
+- **Compliance exposure at scale**: Expanding into two new states triggers new reporting requirements, and the current stack can't produce audit-ready lineage documentation.
+- **Manual reconciliation overhead**: Two full-time analysts spend roughly 30% of their time reconciling mismatches between clinical and claims data before it reaches the analytics layer.
+
+---
+
+## Value Hooks
+
+- **Unified schema governance**: Vetro's shared schema registry directly addresses the conflicting data definitions problem — Rachel referenced this as "the thing that would save us the most time."
+- **Healthcare-specific connectors**: Pre-built connectors for HL7, FHIR, and state Medicaid systems would eliminate the 6-8 week onboarding cycle for new data sources.
+- **Audit-ready lineage**: Automated lineage documentation maps directly to the SOC 2 and state compliance requirements they're worried about for Q4.
+
+---
+
+## Additional Context
+
+| Element | Value |
+|---------|-------|
+| **Messaging Hook** | "We lose two weeks every quarter just reconciling data before anyone can analyze it" — compliance pressure plus operational waste creates dual urgency. |
+| **Repositioning Angle** | Frame data integration as a compliance tool, not just an engineering convenience — the audit lineage angle resonated more than the pipeline consolidation pitch. |
+| **Persona Insight** | VP of Engineering (Rachel Mendez) cares most about reducing team overhead and board-level accountability — she needs to show progress on unification before the October board meeting. |
+| **Voice of Customer** | "The thing that keeps me up at night isn't the pipelines breaking — it's that we can't prove to auditors where the data came from." |
+| **Asset Need** | Healthcare-specific compliance guide showing how lineage documentation maps to SOC 2 and state Medicaid audit requirements. |
+| **Competitive Landscape** | Currently trialing Airbyte (open-source, cost appeal but gaps in healthcare connectors). Previously evaluated Fivetran (rejected on price and connector coverage). |
+| **Integrations** | HL7 feeds from two hospital networks, FHIR API from EHR vendor, three state Medicaid portals, Snowflake as destination warehouse. |
+
+---
+
+<Card title="How summaries work" icon="arrow-right" href="/product/summaries">
+  Learn how OnePerfectSlice generates structured summaries automatically for every call, tailored by call type.
+</Card>

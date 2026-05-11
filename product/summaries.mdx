@@ -20,9 +20,9 @@ This is the key: **every call type has its own summary template.** A discovery c
 Because every call of the same type follows the same structure, you can compare consistently across reps, accounts, and time periods. That's what makes the context useful at scale — for your team, your workflows, and your AI agents.
 
 For example:
-- **Discovery Call summaries** surface pain points, decision criteria, budget signals, and competitive landscape
-- **Demo Call summaries** capture feature reactions, objections addressed, and next steps
-- **Renewal Call summaries** focus on renewal signals, churn risks, and value anchoring
+- **[Discovery Call summaries](/product/examples/discovery-summary)** surface pain points, decision criteria, budget signals, and competitive landscape
+- **[Demo Call summaries](/product/examples/demo-summary)** capture feature reactions, objections addressed, and next steps
+- **[Renewal Call summaries](/product/examples/renewal-summary)** focus on renewal signals, churn risks, and value anchoring
 
 See [Call Classification](/product/call-types) for the full list of call types and what each template covers.
 
@@ -41,3 +41,25 @@ Summaries are available in the app, through the [API](/api/introduction), and to
     Ask Claude to find summaries — "Show me summaries from Jane's discovery calls this week."
   </Card>
 </Columns>
+
+## Frequently asked questions
+
+**What does a summary include?**
+
+Every summary starts with a BLUF (Bottom Line Up Front) — a one-sentence overview of what matters most. Below that, structured sections are tailored to the call type. Discovery summaries include pain themes, value hooks, and GTM-ready slices like messaging hooks, competitive landscape, and voice-of-customer quotes. Demo summaries capture feature reactions, objections, and demo moments. Renewal summaries surface renewal signals, churn risks, and decision dynamics. See [example summaries](/product/examples/discovery-summary) for the full output.
+
+**Are summaries generated automatically?**
+
+Yes. Every call that flows into OnePerfectSlice — whether from Gong, Fireflies, Fathom, or uploaded directly — is automatically classified by type and summarized using the matched template. No manual trigger required.
+
+**Why do different call types get different summaries?**
+
+A discovery call surfaces different context than a demo or a renewal. By tailoring the template to the call type, each summary extracts the context that actually matters for that type of conversation. This also makes summaries comparable — every discovery summary follows the same structure, so you can compare across reps, accounts, and time periods.
+
+**Can I create custom summary templates?**
+
+Yes. Teams can create custom call types with their own summary templates tailored to specific workflows. See [Call Types](/product/call-types) for details.
+
+**How do I access summaries programmatically?**
+
+Summaries are available through the [REST API](/api/endpoints#posts) and the [MCP server](/mcp/tools#search_posts). You can filter by call type, date range, rep, company, and CRM fields.

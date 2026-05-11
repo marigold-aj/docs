@@ -32,9 +32,9 @@ Every call type has its own scorecard template — so a discovery call is evalua
 Because every call of the same type is scored against the same criteria, you can compare across reps, track improvement over time, and identify team-wide patterns — and your agents and workflows can consume the same structured context programmatically.
 
 For example:
-- **Discovery Call scorecards** evaluate decision criteria explored, pain identification, and initiative maturity
-- **Demo Call scorecards** evaluate whether the demo mapped to pain, objections addressed live, and next steps
-- **Renewal Call scorecards** evaluate value anchoring, risk handling, and competitive awareness
+- **[Discovery Call scorecards](/product/examples/discovery-scorecard)** evaluate decision criteria explored, pain identification, and initiative maturity
+- **[Demo Call scorecards](/product/examples/demo-scorecard)** evaluate whether the demo mapped to pain, objections addressed live, and next steps
+- **[Renewal Call scorecards](/product/examples/renewal-scorecard)** evaluate value anchoring, risk handling, and competitive awareness
 
 See [Call Classification](/product/call-types) for the full list of call types and what each template covers.
 
@@ -53,3 +53,29 @@ Scorecards are available in the app, through the [API](/api/introduction), and t
     Ask Claude to find scorecards — "Show me scorecards where reps scored Red on objection handling."
   </Card>
 </Columns>
+
+## Frequently asked questions
+
+**How does the scoring work?**
+
+Each element is scored on a three-point scale: Green (rep covered this element thoroughly), Yellow (partially addressed — key aspects were missed), or Red (not addressed). For each score, the AI provides a rationale with direct evidence from the call and a coaching suggestion for improvement. Green-rated elements receive no coaching suggestion. See [example scorecards](/product/examples/discovery-scorecard) for the full output.
+
+**What elements are evaluated on a scorecard?**
+
+It depends on the call type. Discovery call scorecards evaluate Situation, Pain, Impact, Critical Event, and Decision Process. Demo call scorecards evaluate Pain Reconnection, Solution Fit, Use Cases Confirmed, Objections Addressed Live, and Next Steps. Renewal call scorecards evaluate Adoption Reviewed, Objections Addressed, Deal Risks Identified, Decision Process, and Next Steps. Each call type has its own evaluation criteria.
+
+**Are scorecards generated automatically?**
+
+Yes. Every call that flows into OnePerfectSlice is automatically classified by type and scored against the matched scorecard template. No manual trigger or manager review required.
+
+**How are scorecards different from summaries?**
+
+Summaries extract structured context from a call — what was discussed, what matters, and what to do next. Scorecards evaluate how well the rep executed the call — element by element, with evidence-backed ratings and coaching suggestions. Both are generated automatically for every call.
+
+**Can I use scorecards to track team-wide patterns?**
+
+Yes. Because every call of the same type is scored against the same criteria, you can compare across reps and track improvement over time. If multiple reps are scoring Red on Decision Process, that's a team-wide coaching opportunity — not a one-off gap.
+
+**Can I access scorecards programmatically?**
+
+Yes. Scorecards are available through the [REST API](/api/endpoints#posts) and the [MCP server](/mcp/tools#search_posts). You can filter by call type, date range, rep, company, and CRM fields.

@@ -1,0 +1,51 @@
+---
+title: "Example: Demo Call Summary"
+description: "A real example of the structured summary OnePerfectSlice generates for a demo call — showing pain themes, value hooks, and GTM-ready slices including demo moments, feature reactions, and objections."
+---
+
+This is an example summary generated from a demo call between a solutions engineer at **Vetro** (a B2B data integration platform) and the technical team at **Ridgeline Financial**, a Series C fintech company.
+
+<Info>All names, companies, and details are fictional. The structure and depth of the output reflect what OnePerfectSlice actually produces.</Info>
+
+---
+
+## BLUF (Bottom Line Up Front)
+
+Ridgeline's Head of Data is evaluating Vetro to replace their custom Kafka-to-Snowflake pipeline — the schema drift detection and compliance lineage features landed strongly, but a latency gap on streaming ingestion and an unresolved PCI-DSS mapping question need to be closed before their Q3 budget locks in six weeks.
+
+---
+
+## Pain Themes
+
+- **Schema drift across services**: No centralized schema governance — a breaking change in a downstream service caused a production incident last month that took two days to diagnose.
+- **Manual compliance documentation**: Their compliance analyst currently builds lineage reports manually in spreadsheets for quarterly audits, taking roughly a week each cycle.
+- **Pipeline fragility**: Custom Kafka consumers are maintained by a single engineer — no redundancy, no monitoring, and any changes require a full deploy cycle.
+
+---
+
+## Value Hooks
+
+- **Schema drift detection**: When a breaking change was introduced in the live demo, the system flagged and blocked it automatically — David said "we had a production incident last month because of exactly this."
+- **Automated lineage visualization**: The compliance analyst on the call unmuted for the first time to ask detailed questions about export formats and GRC integration — strong engagement signal.
+- **Managed connector library**: The prospect is attracted to reducing maintenance burden on their custom pipeline, though they need throughput benchmarks before committing.
+
+---
+
+## Additional Context
+
+| Element | Value |
+|---------|-------|
+| **Demo Moment That Landed** | Schema drift detection demo — when the system automatically blocked a breaking change, David referenced a real production incident it would have prevented. The room shifted from evaluating to envisioning. |
+| **Features Highlighted** | Schema Registry with Drift Detection (strongest reaction), Automated Lineage Visualization (engaged compliance stakeholder), Managed Connectors for Kafka/Snowflake/PostgreSQL (positive but throughput concerns), Role-Based Access Controls (brief mention, no strong reaction). |
+| **Integrations** | Kafka (primary ingestion), Snowflake (warehouse), PostgreSQL (operational DB). Need to validate throughput at 2M+ transactions/day for Kafka connector specifically. |
+| **Competitive Landscape** | Build vs. buy decision — current custom pipeline is the primary "competitor." No other vendor evaluation in progress. |
+| **Persona Insight** | Head of Data (David Park) is a technical buyer who makes decisions based on benchmark data, not demos. He'll champion internally but needs hard numbers to present to the CFO for a build-vs-buy analysis. |
+| **Stakeholder Insight** | Unnamed compliance analyst has quiet influence on security requirements. CISO is a gatekeeper (not on call) who will need a direct security-to-security conversation. CFO wants a build-vs-buy cost analysis. |
+| **Objection or Concern Raised** | Streaming throughput: live demo showed ~3 second latency vs. their current sub-second at 2M+ transactions/day. David was direct — "we can't regress on performance." PCI-DSS mapping question deferred to security team. |
+| **Asset Need** | One-page build-vs-buy cost comparison focused on total cost of ownership for custom Kafka pipeline maintenance vs. Vetro managed connectors. |
+
+---
+
+<Card title="How summaries work" icon="arrow-right" href="/product/summaries">
+  Learn how OnePerfectSlice generates structured summaries automatically for every call, tailored by call type.
+</Card>

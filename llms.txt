@@ -13,6 +13,14 @@
 - [Accounts Overview](https://docs.oneperfectslice.ai/accounts/overview)
 - [Roles & Permissions](https://docs.oneperfectslice.ai/accounts/roles-and-permissions)
 
+## Examples
+- [Discovery Call Summary Example](https://docs.oneperfectslice.ai/product/examples/discovery-summary)
+- [Demo Call Summary Example](https://docs.oneperfectslice.ai/product/examples/demo-summary)
+- [Renewal Call Summary Example](https://docs.oneperfectslice.ai/product/examples/renewal-summary)
+- [Discovery Call Scorecard Example](https://docs.oneperfectslice.ai/product/examples/discovery-scorecard)
+- [Demo Call Scorecard Example](https://docs.oneperfectslice.ai/product/examples/demo-scorecard)
+- [Renewal Call Scorecard Example](https://docs.oneperfectslice.ai/product/examples/renewal-scorecard)
+
 ## Integrations
 - [HubSpot](https://docs.oneperfectslice.ai/integrations/hubspot)
 - [Gong](https://docs.oneperfectslice.ai/integrations/gong)
